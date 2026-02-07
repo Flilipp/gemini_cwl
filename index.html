@@ -49,6 +49,8 @@
                                 <option value="blackbar">Czarny Pasek</option>
                                 <option value="pixelate">Pikselizacja</option>
                                 <option value="blur">Rozmycie</option>
+                                <option value="emoji">Emoji 😎</option>
+                                <option value="whitebar">Biały Pasek</option>
                             </select>
                         </div>
 
@@ -57,6 +59,27 @@
                                 <input type="checkbox" id="autoDetect" checked>
                                 Automatyczne wykrywanie (AI)
                             </label>
+                        </div>
+
+                        <div class="control-group">
+                            <label>Obszar Cenzury: <span id="areaPercentageLabel">20%</span></label>
+                            <input type="range" id="areaPercentage" min="10" max="100" value="20" step="5">
+                            <small class="hint">Dostosuj wielkość obszaru cenzury (mniejsza wartość = precyzyjniej)</small>
+                        </div>
+
+                        <div class="control-group">
+                            <label>Pewność Detekcji: <span id="confidenceLabel">50%</span></label>
+                            <input type="range" id="confidenceThreshold" min="10" max="90" value="50" step="5">
+                            <small class="hint">Wyższe wartości = mniej fałszywych detekcji</small>
+                        </div>
+
+                        <div class="control-group">
+                            <label>Obszar do Cenzury:</label>
+                            <select id="targetArea">
+                                <option value="face">Tylko Twarz (Górne 20%)</option>
+                                <option value="upper">Górna Część Ciała (40%)</option>
+                                <option value="full">Pełna Postać (100%)</option>
+                            </select>
                         </div>
 
                         <div class="control-group">
