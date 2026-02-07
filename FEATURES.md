@@ -133,9 +133,9 @@
 
 ### Kod
 - **HTML**: 112 linii
-- **JavaScript**: 348 linii
+- **JavaScript**: 357 linii
 - **CSS**: 307 linii
-- **TOTAL**: 767 linii kodu
+- **TOTAL**: 776 linii kodu
 
 ### Pliki
 - `index.html` - główny interfejs
@@ -151,9 +151,9 @@
 - COCO-SSD Model 2.2.3
 
 ### Rozmiar
-- **Total size**: ~25KB (bez bibliotek)
+- **Total size**: ~27KB (bez bibliotek)
 - **With libraries**: ~5MB (pierwsze załadowanie)
-- **Cached**: ~25KB (kolejne wizyty)
+- **Cached**: ~27KB (kolejne wizyty)
 
 ---
 

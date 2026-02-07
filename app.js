@@ -229,7 +229,7 @@ class CensorCraft {
     }
 
     stopDrawing(e) {
-        if (!this.isDrawing || !this.drawMode || !e) return;
+        if (!this.isDrawing || !this.drawMode) return;
         
         this.isDrawing = false;
         const rect = this.overlayCanvas.getBoundingClientRect();
