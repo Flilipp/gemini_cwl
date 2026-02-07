@@ -2,7 +2,7 @@
 
 **Darmowe, open-source'owe i w 100% prywatne narzędzie do automatycznej cenzury, które działa w Twojej przeglądarce.**
 
-[![Status Projektu: Wczesna Faza Rozwoju](https://img.shields.io/badge/status-wczesny%20rozwój-red.svg)](https://github.com/twoj-nick/twoje-repo)
+[![Status Projektu: MVP Ukończone](https://img.shields.io/badge/status-MVP%20ukończone-green.svg)](https://github.com/Flilipp/gemini_cwl)
 [![Licencja: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
 ---
@@ -13,13 +13,27 @@ Project CensorCraft to odpowiedź na potrzebę społeczności - proste, darmowe 
 
 Wszystko, co robisz, dzieje się **lokalnie na Twoim urządzeniu**. Twoje pliki nigdy nie opuszczają Twojego komputera.
 
-## ✨ Kluczowe Funkcje (Planowane)
+## 🎉 Gotowe do Użycia!
 
-*   **Automatyczne Wykrywanie:** Sztuczna inteligencja będzie automatycznie rozpoznawać obszary do ocenzurowania.
-*   **Różne Style Cenzury:** Wybieraj spośród klasycznych czarnych pasków, pikselizacji, efektu rozmycia i innych kreatywnych opcji.
-*   **Pełna Kontrola Ręczna:** Poprawiaj i dostosowuj obszary cenzury co do piksela.
-*   **Przetwarzanie po Stronie Klienta:** 100% prywatności. Aplikacja działa w przeglądarce, a Twoje pliki nie są nigdzie wysyłane.
-*   **Darmowe i Open-Source:** Na zawsze, dla wszystkich. Bez reklam, bez subskrypcji.
+**MVP jest już dostępne!** Możesz używać CensorCraft już teraz:
+
+1. Otwórz `index.html` w przeglądarce
+2. Przeciągnij zdjęcie lub kliknij "Wybierz Zdjęcie"
+3. AI automatycznie wykryje osoby i je ocenzuruje
+4. Pobierz ocenzurowany obraz!
+
+📚 **Dokumentacja:**
+- [INSTRUKCJA.md](INSTRUKCJA.md) - jak używać aplikacji
+- [DEVELOPER.md](DEVELOPER.md) - dokumentacja techniczna
+- [FEATURES.md](FEATURES.md) - pełna lista funkcji
+
+## ✨ Kluczowe Funkcje (Zaimplementowane!)
+
+*   ✅ **Automatyczne Wykrywanie:** Sztuczna inteligencja automatycznie rozpoznaje osoby i je cenzuruje (COCO-SSD).
+*   ✅ **Różne Style Cenzury:** Wybieraj spośród czarnych pasków, pikselizacji i rozmycia.
+*   ✅ **Pełna Kontrola Ręczna:** Tryb rysowania - zaznaczaj własne obszary do ocenzurowania.
+*   ✅ **Przetwarzanie po Stronie Klienta:** 100% prywatności. Aplikacja działa w przeglądarce, a Twoje pliki nie są nigdzie wysyłane.
+*   ✅ **Darmowe i Open-Source:** Na zawsze, dla wszystkich. Bez reklam, bez subskrypcji.
 
 ## 🚀 Jak to Działa? (Technologia)
 
@@ -41,13 +55,38 @@ Ten projekt jest tworzony przez społeczność, dla społeczności. Każda pomoc
 
 **Dołącz do nas na Discordzie:** [Wstaw tutaj link do swojego serwera Discord, gdy go założysz]
 
+## 📋 Szybki Start
+
+### Użytkownicy
+
+1. Pobierz repozytorium lub sklonuj: `git clone https://github.com/Flilipp/gemini_cwl.git`
+2. Otwórz plik `index.html` w przeglądarce
+3. Gotowe! Zobacz [INSTRUKCJA.md](INSTRUKCJA.md) po więcej szczegółów
+
+### Deweloperzy
+
+```bash
+# Sklonuj repozytorium
+git clone https://github.com/Flilipp/gemini_cwl.git
+cd gemini_cwl
+
+# Uruchom lokalny serwer (opcjonalne)
+python -m http.server 8080
+
+# Otwórz w przeglądarce
+# http://localhost:8080
+```
+
+Zobacz [DEVELOPER.md](DEVELOPER.md) po dokumentację techniczną.
+
 ## 🗺️ Mapa Drogowa (Roadmap)
 
-*   **[ ] Faza 1: MVP (Minimum Viable Product)**
-    *   Stworzenie podstawowego interfejsu do wgrywania zdjęć.
-    *   Implementacja jednego, podstawowego modelu AI do wykrywania.
-    *   Dodanie jednej opcji cenzury (np. czarny pasek).
-    *   Opcja pobrania ocenzurowanego obrazu.
+*   **[✅] Faza 1: MVP (Minimum Viable Product)** - UKOŃCZONE!
+    *   ✅ Stworzenie podstawowego interfejsu do wgrywania zdjęć (+ drag & drop).
+    *   ✅ Implementacja modelu AI do wykrywania (COCO-SSD + TensorFlow.js).
+    *   ✅ Dodanie trzech opcji cenzury (czarny pasek, pikselizacja, blur).
+    *   ✅ Opcja pobrania ocenzurowanego obrazu.
+    *   ✅ Tryb ręcznego rysowania obszarów cenzury.
 *   **[ ] Faza 2: Rozbudowa Funkcji**
     *   Dodanie większej liczby stylów cenzury (piksele, blur).
     *   Wprowadzenie narzędzi do manualnej edycji.
