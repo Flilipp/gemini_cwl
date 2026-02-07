@@ -69,8 +69,8 @@ class CensorCraft {
         // Canvas drawing
         this.overlayCanvas.addEventListener('mousedown', (e) => this.startDrawing(e));
         this.overlayCanvas.addEventListener('mousemove', (e) => this.draw(e));
-        this.overlayCanvas.addEventListener('mouseup', () => this.stopDrawing());
-        this.overlayCanvas.addEventListener('mouseleave', () => this.stopDrawing());
+        this.overlayCanvas.addEventListener('mouseup', (e) => this.stopDrawing(e));
+        this.overlayCanvas.addEventListener('mouseleave', (e) => this.stopDrawing(e));
     }
 
     async loadModel() {
@@ -228,13 +228,13 @@ class CensorCraft {
         this.overlayCtx.setLineDash([]);
     }
 
-    stopDrawing() {
-        if (!this.isDrawing || !this.drawMode) return;
+    stopDrawing(e) {
+        if (!this.isDrawing || !this.drawMode || !e) return;
         
         this.isDrawing = false;
         const rect = this.overlayCanvas.getBoundingClientRect();
-        const endX = event.clientX - rect.left;
-        const endY = event.clientY - rect.top;
+        const endX = e.clientX - rect.left;
+        const endY = e.clientY - rect.top;
 
         const width = endX - this.startX;
         const height = endY - this.startY;
@@ -296,17 +296,26 @@ class CensorCraft {
     }
 
     blurArea(area) {
-        // Simple blur using canvas filter
+        // Create temporary canvas for blurring
+        const tempCanvas = document.createElement('canvas');
+        const tempCtx = tempCanvas.getContext('2d');
+        
+        // Add padding for blur effect
+        const padding = 30;
+        const x = Math.max(0, area.x - padding);
+        const y = Math.max(0, area.y - padding);
+        const width = Math.min(this.canvas.width - x, area.width + padding * 2);
+        const height = Math.min(this.canvas.height - y, area.height + padding * 2);
+        
+        tempCanvas.width = width;
+        tempCanvas.height = height;
+        
+        // Copy area to temp canvas
+        tempCtx.drawImage(this.canvas, x, y, width, height, 0, 0, width, height);
+        
+        // Apply blur filter and draw back
         this.ctx.filter = 'blur(25px)';
-        const imageData = this.ctx.getImageData(area.x, area.y, area.width, area.height);
-        this.ctx.putImageData(imageData, area.x, area.y);
-        
-        // Apply blur multiple times for stronger effect
-        for (let i = 0; i < 3; i++) {
-            const blurredData = this.ctx.getImageData(area.x - 25, area.y - 25, area.width + 50, area.height + 50);
-            this.ctx.putImageData(blurredData, area.x - 25, area.y - 25);
-        }
-        
+        this.ctx.drawImage(tempCanvas, 0, 0, width, height, x, y, width, height);
         this.ctx.filter = 'none';
     }
 
