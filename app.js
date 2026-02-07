@@ -32,6 +32,11 @@ class CensorCraft {
         this.censorStyleSelect = document.getElementById('censorStyle');
         this.autoDetectCheckbox = document.getElementById('autoDetect');
         this.drawModeBtn = document.getElementById('drawModeBtn');
+        this.areaPercentageSlider = document.getElementById('areaPercentage');
+        this.areaPercentageLabel = document.getElementById('areaPercentageLabel');
+        this.confidenceSlider = document.getElementById('confidenceThreshold');
+        this.confidenceLabel = document.getElementById('confidenceLabel');
+        this.targetAreaSelect = document.getElementById('targetArea');
     }
 
     attachEventListeners() {
@@ -71,6 +76,15 @@ class CensorCraft {
         this.overlayCanvas.addEventListener('mousemove', (e) => this.draw(e));
         this.overlayCanvas.addEventListener('mouseup', (e) => this.stopDrawing(e));
         this.overlayCanvas.addEventListener('mouseleave', (e) => this.stopDrawing(e));
+        
+        // Slider updates
+        this.areaPercentageSlider.addEventListener('input', (e) => {
+            this.areaPercentageLabel.textContent = e.target.value + '%';
+        });
+        
+        this.confidenceSlider.addEventListener('input', (e) => {
+            this.confidenceLabel.textContent = e.target.value + '%';
+        });
     }
 
     async loadModel() {
@@ -149,21 +163,33 @@ class CensorCraft {
             const predictions = await this.model.detect(this.canvas);
             console.log('Wykryto obiekty:', predictions);
 
-            // Detect people (person class)
-            const people = predictions.filter(p => p.class === 'person');
+            // Get confidence threshold
+            const confidenceThreshold = this.confidenceSlider.value / 100;
+            
+            // Detect people (person class) with confidence threshold
+            const people = predictions.filter(p => 
+                p.class === 'person' && p.score >= confidenceThreshold
+            );
             
             if (people.length === 0) {
-                alert('Nie wykryto żadnych osób na zdjęciu. Możesz użyć trybu ręcznego.');
+                alert('Nie wykryto żadnych osób na zdjęciu z wybranym poziomem pewności. Możesz użyć trybu ręcznego lub zmniejszyć próg pewności.');
             } else {
+                // Get area percentage setting
+                const areaPercentage = this.areaPercentageSlider.value / 100;
+                
                 // Add detected areas to censor
                 people.forEach(person => {
-                    // Focus on upper body (face area) - top 30% of detected person
                     const [x, y, w, h] = person.bbox;
+                    
+                    // Censor from top down using the area percentage slider
+                    const censorHeight = h * areaPercentage;
+                    const censorY = y;
+                    
                     this.censorAreas.push({
                         x: x,
-                        y: y,
+                        y: censorY,
                         width: w,
-                        height: h * 0.3 // Only censor top 30% (head area)
+                        height: censorHeight
                     });
                 });
                 
@@ -259,14 +285,19 @@ class CensorCraft {
 
         const style = this.censorStyleSelect.value;
 
-        this.censorAreas.forEach(area => {
+        this.censorAreas.forEach((area, index) => {
             if (style === 'blackbar') {
                 this.ctx.fillStyle = 'black';
+                this.ctx.fillRect(area.x, area.y, area.width, area.height);
+            } else if (style === 'whitebar') {
+                this.ctx.fillStyle = 'white';
                 this.ctx.fillRect(area.x, area.y, area.width, area.height);
             } else if (style === 'pixelate') {
                 this.pixelateArea(area);
             } else if (style === 'blur') {
                 this.blurArea(area);
+            } else if (style === 'emoji') {
+                this.emojiArea(area, index);
             }
         });
     }
@@ -317,6 +348,24 @@ class CensorCraft {
         this.ctx.filter = 'blur(25px)';
         this.ctx.drawImage(tempCanvas, 0, 0, width, height, x, y, width, height);
         this.ctx.filter = 'none';
+    }
+
+    emojiArea(area, index) {
+        // Fill with white background first
+        this.ctx.fillStyle = 'rgba(255, 255, 255, 0.9)';
+        this.ctx.fillRect(area.x, area.y, area.width, area.height);
+        
+        // Draw emoji
+        const emojiSize = Math.min(area.width, area.height) * 0.6;
+        this.ctx.font = `${emojiSize}px Arial`;
+        this.ctx.textAlign = 'center';
+        this.ctx.textBaseline = 'middle';
+        
+        // Use deterministic emoji selection based on area index
+        const emojis = ['😎', '🙈', '🤐', '🤫', '😶', '🫣'];
+        const emoji = emojis[index % emojis.length];
+        
+        this.ctx.fillText(emoji, area.x + area.width / 2, area.y + area.height / 2);
     }
 
     clearCensorship() {
