@@ -174,36 +174,16 @@ class CensorCraft {
             if (people.length === 0) {
                 alert('Nie wykryto żadnych osób na zdjęciu z wybranym poziomem pewności. Możesz użyć trybu ręcznego lub zmniejszyć próg pewności.');
             } else {
-                // Get target area setting
-                const targetArea = this.targetAreaSelect.value;
+                // Get area percentage setting
                 const areaPercentage = this.areaPercentageSlider.value / 100;
                 
                 // Add detected areas to censor
                 people.forEach(person => {
                     const [x, y, w, h] = person.bbox;
-                    let censorHeight, censorY;
                     
-                    // Determine which part of the detected person to censor
-                    switch(targetArea) {
-                        case 'face':
-                            // Focus on face area (top 20% by default, adjustable)
-                            censorHeight = h * Math.min(areaPercentage, 0.3);
-                            censorY = y;
-                            break;
-                        case 'upper':
-                            // Upper body (top 40% by default, adjustable)
-                            censorHeight = h * Math.min(areaPercentage * 2, 0.5);
-                            censorY = y;
-                            break;
-                        case 'full':
-                            // Full person with adjustable margin
-                            censorHeight = h * areaPercentage;
-                            censorY = y + (h * (1 - areaPercentage) / 2);
-                            break;
-                        default:
-                            censorHeight = h * 0.2;
-                            censorY = y;
-                    }
+                    // Censor from top down using the area percentage slider
+                    const censorHeight = h * areaPercentage;
+                    const censorY = y;
                     
                     this.censorAreas.push({
                         x: x,
@@ -305,7 +285,7 @@ class CensorCraft {
 
         const style = this.censorStyleSelect.value;
 
-        this.censorAreas.forEach(area => {
+        this.censorAreas.forEach((area, index) => {
             if (style === 'blackbar') {
                 this.ctx.fillStyle = 'black';
                 this.ctx.fillRect(area.x, area.y, area.width, area.height);
@@ -317,7 +297,7 @@ class CensorCraft {
             } else if (style === 'blur') {
                 this.blurArea(area);
             } else if (style === 'emoji') {
-                this.emojiArea(area);
+                this.emojiArea(area, index);
             }
         });
     }
@@ -370,7 +350,7 @@ class CensorCraft {
         this.ctx.filter = 'none';
     }
 
-    emojiArea(area) {
+    emojiArea(area, index) {
         // Fill with white background first
         this.ctx.fillStyle = 'rgba(255, 255, 255, 0.9)';
         this.ctx.fillRect(area.x, area.y, area.width, area.height);
@@ -381,9 +361,9 @@ class CensorCraft {
         this.ctx.textAlign = 'center';
         this.ctx.textBaseline = 'middle';
         
-        // Random emoji from set
+        // Use deterministic emoji selection based on area index
         const emojis = ['😎', '🙈', '🤐', '🤫', '😶', '🫣'];
-        const emoji = emojis[Math.floor(Math.random() * emojis.length)];
+        const emoji = emojis[index % emojis.length];
         
         this.ctx.fillText(emoji, area.x + area.width / 2, area.y + area.height / 2);
     }
