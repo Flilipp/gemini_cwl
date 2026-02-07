@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CensorCraft - Darmowe Narzędzie do Cenzury</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🎨 CensorCraft</h1>
+            <p class="subtitle">Darmowe, prywatne narzędzie do automatycznej cenzury</p>
+            <div class="badges">
+                <span class="badge">100% Prywatne</span>
+                <span class="badge">Działa w Przeglądarce</span>
+                <span class="badge">Open Source</span>
+            </div>
+        </header>
+
+        <main>
+            <div class="upload-section" id="uploadSection">
+                <div class="upload-area" id="uploadArea">
+                    <svg class="upload-icon" xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                        <polyline points="17 8 12 3 7 8"></polyline>
+                        <line x1="12" y1="3" x2="12" y2="15"></line>
+                    </svg>
+                    <h2>Przeciągnij zdjęcie tutaj</h2>
+                    <p>lub kliknij, aby wybrać plik</p>
+                    <input type="file" id="fileInput" accept="image/*" hidden>
+                    <button class="btn-primary" id="selectFileBtn">Wybierz Zdjęcie</button>
+                </div>
+            </div>
+
+            <div class="editor-section" id="editorSection" style="display: none;">
+                <div class="editor-container">
+                    <div class="canvas-wrapper">
+                        <canvas id="canvas"></canvas>
+                        <canvas id="overlayCanvas"></canvas>
+                    </div>
+                    
+                    <div class="controls">
+                        <h3>Kontrola Cenzury</h3>
+                        
+                        <div class="control-group">
+                            <label>Styl Cenzury:</label>
+                            <select id="censorStyle">
+                                <option value="blackbar">Czarny Pasek</option>
+                                <option value="pixelate">Pikselizacja</option>
+                                <option value="blur">Rozmycie</option>
+                            </select>
+                        </div>
+
+                        <div class="control-group">
+                            <label>
+                                <input type="checkbox" id="autoDetect" checked>
+                                Automatyczne wykrywanie (AI)
+                            </label>
+                        </div>
+
+                        <div class="control-group">
+                            <button class="btn-secondary" id="detectBtn">
+                                🤖 Wykryj Automatycznie
+                            </button>
+                        </div>
+
+                        <div class="control-group">
+                            <label>Tryb Ręczny:</label>
+                            <button class="btn-secondary" id="drawModeBtn">
+                                ✏️ Rysuj Obszar Cenzury
+                            </button>
+                        </div>
+
+                        <div class="control-group">
+                            <button class="btn-secondary" id="clearBtn">
+                                🗑️ Wyczyść Wszystko
+                            </button>
+                        </div>
+
+                        <div class="control-group action-buttons">
+                            <button class="btn-primary" id="downloadBtn">
+                                ⬇️ Pobierz Ocenzurowany Obraz
+                            </button>
+                            <button class="btn-secondary" id="newImageBtn">
+                                🔄 Nowy Obraz
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="info-box">
+                    <p>💡 <strong>Wskazówka:</strong> Twoje zdjęcia są przetwarzane lokalnie w przeglądarce. Nic nie jest wysyłane do Internetu!</p>
+                </div>
+            </div>
+
+            <div class="loading" id="loading" style="display: none;">
+                <div class="spinner"></div>
+                <p>Ładowanie modelu AI...</p>
+            </div>
+        </main>
+
+        <footer>
+            <p>Made with ❤️ by the community | <a href="https://github.com/Flilipp/gemini_cwl" target="_blank">GitHub</a> | Licencja MIT</p>
+        </footer>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@4.11.0"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@tensorflow-models/coco-ssd@2.2.3"></script>
+    <script src="app.js"></script>
+</body>
+</html>
