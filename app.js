@@ -13,6 +13,9 @@ class CensorCraft {
         this.isDrawing = false;
         this.drawMode = false;
         this.cropMode = false;
+        this.arcMode = false;
+        this.arcPoints = [];
+        this.customTexture = null;
         this.startX = 0;
         this.startY = 0;
         
@@ -127,6 +130,15 @@ class CensorCraft {
         // Detection mode selector
         this.detectionModeSelect = document.getElementById('detectionMode');
         
+        // Custom texture elements
+        this.textureInput = document.getElementById('textureInput');
+        this.uploadTextureBtn = document.getElementById('uploadTextureBtn');
+        this.textureUploadSection = document.getElementById('textureUploadSection');
+        this.textureHint = document.getElementById('textureHint');
+        
+        // Arc mode button
+        this.arcModeBtn = document.getElementById('arcModeBtn');
+        
         // Initialize category grid
         this.initializeCategoryGrid();
     }
@@ -168,6 +180,27 @@ class CensorCraft {
         this.newImageBtn.addEventListener('click', () => this.reset());
         this.drawModeBtn.addEventListener('click', () => this.toggleDrawMode());
         
+        if (this.arcModeBtn) {
+            this.arcModeBtn.addEventListener('click', () => this.toggleArcMode());
+        }
+        
+        // Custom texture upload
+        if (this.uploadTextureBtn && this.textureInput) {
+            this.uploadTextureBtn.addEventListener('click', () => this.textureInput.click());
+            this.textureInput.addEventListener('change', (e) => this.handleTextureSelect(e));
+        }
+        
+        // Censor style change - show/hide texture upload section
+        if (this.censorStyleSelect && this.textureUploadSection) {
+            this.censorStyleSelect.addEventListener('change', (e) => {
+                if (e.target.value === 'texture') {
+                    this.textureUploadSection.style.display = 'block';
+                } else {
+                    this.textureUploadSection.style.display = 'none';
+                }
+            });
+        }
+        
         // Canvas drawing
         this.overlayCanvas.addEventListener('mousedown', (e) => this.handleMouseDown(e));
         this.overlayCanvas.addEventListener('mousemove', (e) => this.handleMouseMove(e));
@@ -175,9 +208,11 @@ class CensorCraft {
         this.overlayCanvas.addEventListener('mouseleave', (e) => this.handleMouseUp(e));
         
         // Adjustment sliders
-        this.areaPercentageSlider.addEventListener('input', (e) => {
-            this.areaPercentageLabel.textContent = e.target.value + '%';
-        });
+        if (this.areaPercentageSlider && this.areaPercentageLabel) {
+            this.areaPercentageSlider.addEventListener('input', (e) => {
+                this.areaPercentageLabel.textContent = e.target.value + '%';
+            });
+        }
         
         this.confidenceSlider.addEventListener('input', (e) => {
             this.confidenceLabel.textContent = e.target.value + '%';
@@ -857,20 +892,13 @@ class CensorCraft {
             this.showLoading(false);
         }
     }
-                });
-                
-                this.saveState();
-                this.applyCensorship();
-            }
-        } catch (error) {
-            console.error('Błąd wykrywania:', error);
-            alert('Wystąpił błąd podczas wykrywania.');
-        } finally {
-            this.showLoading(false);
-        }
-    }
 
     toggleDrawMode() {
+        // Disable arc mode if active
+        if (this.arcMode) {
+            this.toggleArcMode();
+        }
+        
         this.drawMode = !this.drawMode;
         const wrapper = document.querySelector('.canvas-wrapper');
         
@@ -889,12 +917,67 @@ class CensorCraft {
         }
     }
 
+    toggleArcMode() {
+        // Disable draw mode if active
+        if (this.drawMode) {
+            this.toggleDrawMode();
+        }
+        
+        this.arcMode = !this.arcMode;
+        const wrapper = document.querySelector('.canvas-wrapper');
+        
+        if (this.arcMode) {
+            wrapper.classList.add('draw-mode');
+            this.arcModeBtn.textContent = '🛑 Zakończ Rysowanie Łuków';
+            this.arcModeBtn.style.background = '#dc3545';
+            this.arcModeBtn.style.color = 'white';
+            this.arcModeBtn.style.borderColor = '#dc3545';
+            // Clear previous arc points
+            this.arcPoints = [];
+            alert('Tryb rysowania łuków: Klikaj aby dodać punkty, rysuj łuki między nimi. Kliknij ponownie aby zakończyć.');
+        } else {
+            wrapper.classList.remove('draw-mode');
+            this.arcModeBtn.textContent = '🌙 Rysuj Łuki i Krzywe';
+            this.arcModeBtn.style.background = '';
+            this.arcModeBtn.style.color = '';
+            this.arcModeBtn.style.borderColor = '';
+            
+            // If we have arc points, create censored area from them
+            if (this.arcPoints.length >= 2) {
+                this.createArcCensorArea();
+            }
+            this.arcPoints = [];
+            this.overlayCtx.clearRect(0, 0, this.overlayCanvas.width, this.overlayCanvas.height);
+        }
+    }
+
+    handleTextureSelect(e) {
+        const file = e.target.files[0];
+        if (file && file.type.startsWith('image/')) {
+            const reader = new FileReader();
+            reader.onload = (event) => {
+                const img = new Image();
+                img.onload = () => {
+                    this.customTexture = img;
+                    this.textureHint.textContent = `Wybrano: ${file.name}`;
+                    this.textureHint.style.color = '#28a745';
+                };
+                img.src = event.target.result;
+            };
+            reader.readAsDataURL(file);
+        }
+    }
+
     handleMouseDown(e) {
         const rect = this.overlayCanvas.getBoundingClientRect();
         this.startX = e.clientX - rect.left;
         this.startY = e.clientY - rect.top;
         
-        if (this.drawMode || this.cropMode) {
+        if (this.arcMode) {
+            // Add point for arc drawing
+            this.arcPoints.push({ x: this.startX, y: this.startY });
+            this.drawArcPreview();
+        } else if (this.drawMode || this.cropMode) {
             this.isDrawing = true;
         }
     }
@@ -1003,6 +1086,8 @@ class CensorCraft {
                 this.blurArea(area);
             } else if (style === 'emoji') {
                 this.emojiArea(area, index);
+            } else if (style === 'texture') {
+                this.textureArea(area);
             }
         });
     }
@@ -1063,8 +1148,95 @@ class CensorCraft {
         this.ctx.fillText(emoji, area.x + area.width / 2, area.y + area.height / 2);
     }
 
+    textureArea(area) {
+        if (!this.customTexture) {
+            // Fallback to black bar if no texture uploaded
+            this.ctx.fillStyle = 'black';
+            this.ctx.fillRect(area.x, area.y, area.width, area.height);
+            return;
+        }
+        
+        // Create pattern from texture
+        const pattern = this.ctx.createPattern(this.customTexture, 'repeat');
+        this.ctx.fillStyle = pattern;
+        this.ctx.fillRect(area.x, area.y, area.width, area.height);
+    }
+
+    drawArcPreview() {
+        this.overlayCtx.clearRect(0, 0, this.overlayCanvas.width, this.overlayCanvas.height);
+        
+        if (this.arcPoints.length === 0) return;
+        
+        // Draw all points
+        this.overlayCtx.fillStyle = 'rgba(255, 0, 0, 0.8)';
+        this.arcPoints.forEach(point => {
+            this.overlayCtx.beginPath();
+            this.overlayCtx.arc(point.x, point.y, 5, 0, Math.PI * 2);
+            this.overlayCtx.fill();
+        });
+        
+        // Draw curves between points
+        if (this.arcPoints.length >= 2) {
+            this.overlayCtx.strokeStyle = 'rgba(255, 0, 0, 0.8)';
+            this.overlayCtx.lineWidth = 3;
+            this.overlayCtx.beginPath();
+            this.overlayCtx.moveTo(this.arcPoints[0].x, this.arcPoints[0].y);
+            
+            // Use quadratic curves for smooth arcs
+            for (let i = 1; i < this.arcPoints.length; i++) {
+                if (i < this.arcPoints.length - 1) {
+                    // Calculate control point as midpoint between current and next point
+                    const xc = (this.arcPoints[i].x + this.arcPoints[i + 1].x) / 2;
+                    const yc = (this.arcPoints[i].y + this.arcPoints[i + 1].y) / 2;
+                    this.overlayCtx.quadraticCurveTo(this.arcPoints[i].x, this.arcPoints[i].y, xc, yc);
+                } else {
+                    // Last point
+                    this.overlayCtx.lineTo(this.arcPoints[i].x, this.arcPoints[i].y);
+                }
+            }
+            
+            this.overlayCtx.stroke();
+        }
+    }
+
+    createArcCensorArea() {
+        if (this.arcPoints.length < 2) return;
+        
+        // Find bounding box of all arc points with padding
+        let minX = this.arcPoints[0].x;
+        let maxX = this.arcPoints[0].x;
+        let minY = this.arcPoints[0].y;
+        let maxY = this.arcPoints[0].y;
+        
+        this.arcPoints.forEach(point => {
+            minX = Math.min(minX, point.x);
+            maxX = Math.max(maxX, point.x);
+            minY = Math.min(minY, point.y);
+            maxY = Math.max(maxY, point.y);
+        });
+        
+        // Add padding around the arc
+        const padding = 20;
+        minX = Math.max(0, minX - padding);
+        minY = Math.max(0, minY - padding);
+        maxX = Math.min(this.canvas.width, maxX + padding);
+        maxY = Math.min(this.canvas.height, maxY + padding);
+        
+        // Create censored area from bounding box
+        this.censorAreas.push({
+            x: minX,
+            y: minY,
+            width: maxX - minX,
+            height: maxY - minY
+        });
+        
+        this.saveState();
+        this.applyCensorship();
+    }
+
     clearCensorship() {
         this.censorAreas = [];
+        this.arcPoints = [];
         this.saveState();
         this.renderImage();
         this.overlayCtx.clearRect(0, 0, this.overlayCanvas.width, this.overlayCanvas.height);
