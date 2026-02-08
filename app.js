@@ -1012,7 +1012,12 @@ class CensorCraft {
         } catch (error) {
             console.error('Błąd wykrywania NSFW:', error);
             let errorMessage = 'Wystąpił błąd podczas wykrywania treści NSFW.';
-            if (error.message && error.message.includes('fetch')) {
+            
+            // Check for network-related errors
+            if (error instanceof TypeError || 
+                (error.message && (error.message.toLowerCase().includes('fetch') || 
+                                   error.message.toLowerCase().includes('network') ||
+                                   error.message.toLowerCase().includes('load')))) {
                 errorMessage += '\n\nProblem z połączeniem sieciowym. Sprawdź połączenie internetowe i spróbuj ponownie.';
             } else if (error.message) {
                 errorMessage += `\n\nSzczegóły: ${error.message}`;
