@@ -276,11 +276,29 @@ class CensorCraft {
             });
         }
         
-        // Canvas drawing
+        // Canvas drawing - Mouse events
         this.overlayCanvas.addEventListener('mousedown', (e) => this.handleMouseDown(e));
         this.overlayCanvas.addEventListener('mousemove', (e) => this.handleMouseMove(e));
         this.overlayCanvas.addEventListener('mouseup', (e) => this.handleMouseUp(e));
         this.overlayCanvas.addEventListener('mouseleave', (e) => this.handleMouseUp(e));
+        
+        // Canvas drawing - Touch events for mobile devices
+        this.overlayCanvas.addEventListener('touchstart', (e) => {
+            e.preventDefault(); // Prevent scrolling while drawing
+            this.handleMouseDown(e);
+        }, { passive: false });
+        this.overlayCanvas.addEventListener('touchmove', (e) => {
+            e.preventDefault(); // Prevent scrolling while drawing
+            this.handleMouseMove(e);
+        }, { passive: false });
+        this.overlayCanvas.addEventListener('touchend', (e) => {
+            e.preventDefault();
+            this.handleMouseUp(e);
+        }, { passive: false });
+        this.overlayCanvas.addEventListener('touchcancel', (e) => {
+            e.preventDefault();
+            this.handleMouseUp(e);
+        }, { passive: false });
         
         // Adjustment sliders
         if (this.areaPercentageSlider && this.areaPercentageLabel) {
@@ -1160,10 +1178,40 @@ class CensorCraft {
         }
     }
 
-    handleMouseDown(e) {
+    // Helper method to get proper canvas coordinates from mouse/touch events
+    // This accounts for canvas scaling (CSS size vs actual canvas pixel dimensions)
+    getCanvasCoordinates(e) {
         const rect = this.overlayCanvas.getBoundingClientRect();
-        this.startX = e.clientX - rect.left;
-        this.startY = e.clientY - rect.top;
+        const scaleX = this.overlayCanvas.width / rect.width;
+        const scaleY = this.overlayCanvas.height / rect.height;
+        
+        // Get the client coordinates from mouse or touch event
+        let clientX, clientY;
+        if (e.touches && e.touches.length > 0) {
+            // Touch event (touchstart, touchmove)
+            clientX = e.touches[0].clientX;
+            clientY = e.touches[0].clientY;
+        } else if (e.changedTouches && e.changedTouches.length > 0) {
+            // Touch end/cancel event (touchend, touchcancel)
+            clientX = e.changedTouches[0].clientX;
+            clientY = e.changedTouches[0].clientY;
+        } else {
+            // Mouse event
+            clientX = e.clientX;
+            clientY = e.clientY;
+        }
+        
+        // Calculate position relative to canvas and scale to actual canvas coordinates
+        const x = (clientX - rect.left) * scaleX;
+        const y = (clientY - rect.top) * scaleY;
+        
+        return { x, y };
+    }
+
+    handleMouseDown(e) {
+        const coords = this.getCanvasCoordinates(e);
+        this.startX = coords.x;
+        this.startY = coords.y;
         
         if (this.arcMode) {
             // Add point for arc drawing
@@ -1177,9 +1225,9 @@ class CensorCraft {
     handleMouseMove(e) {
         if (!this.isDrawing) return;
 
-        const rect = this.overlayCanvas.getBoundingClientRect();
-        const currentX = e.clientX - rect.left;
-        const currentY = e.clientY - rect.top;
+        const coords = this.getCanvasCoordinates(e);
+        const currentX = coords.x;
+        const currentY = coords.y;
 
         this.overlayCtx.clearRect(0, 0, this.overlayCanvas.width, this.overlayCanvas.height);
         
@@ -1200,9 +1248,9 @@ class CensorCraft {
         if (!this.isDrawing) return;
         
         this.isDrawing = false;
-        const rect = this.overlayCanvas.getBoundingClientRect();
-        const endX = e.clientX - rect.left;
-        const endY = e.clientY - rect.top;
+        const coords = this.getCanvasCoordinates(e);
+        const endX = coords.x;
+        const endY = coords.y;
 
         const width = endX - this.startX;
         const height = endY - this.startY;
