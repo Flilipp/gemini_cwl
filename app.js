@@ -27,7 +27,7 @@ class CensorCraft {
         this.modelsLoading = false;
         this.bodyPixLoading = false;
         this.nsfwLoading = false;
-        this.isMobile = this.detectMobile();
+        this.isMobile = this.isMobileUserAgent();
         
         // Image adjustments
         this.adjustments = {
@@ -90,10 +90,17 @@ class CensorCraft {
         // Pattern configuration
         this.patternConfig = {
             stripeWidth: 10,
+            stripeColor1: '#000000',
+            stripeColor2: '#FFFFFF',
             dotSize: 8,
             dotSpacing: 15,
-            gridSize: 20
+            dotColor: '#000000',
+            gridSize: 20,
+            gridColor: '#000000'
         };
+        
+        // Mobile auto-detection threshold (in pixels)
+        this.MAX_MOBILE_AUTO_DETECT_PIXELS = 1000000;  // 1 megapixel
         
         // Gradient colors (can be customized later)
         this.gradientColors = [
@@ -107,13 +114,13 @@ class CensorCraft {
         // Don't load models immediately - use lazy loading instead
     }
     
-    detectMobile() {
+    isMobileUserAgent() {
         return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
     }
     
     isMobileDevice() {
         // Dynamic check that considers current window size
-        return this.detectMobile() || window.innerWidth <= 768;
+        return this.isMobileUserAgent() || window.innerWidth <= 768;
     }
 
     initializeElements() {
@@ -535,7 +542,12 @@ class CensorCraft {
                 quantBytes: 2
             };
             
-            this.bodyPixModel = await this.retryLoad(() => bodyPix.load(config), 3);
+            this.bodyPixModel = await this.retryLoad(
+                () => bodyPix.load(config), 
+                3,
+                1000,
+                'BodyPix'
+            );
             console.log('Model BodyPix załadowany!');
             return this.bodyPixModel;
         } catch (error) {
@@ -559,7 +571,12 @@ class CensorCraft {
         this.nsfwLoading = true;
         try {
             console.log('Ładowanie modelu NSFW...');
-            this.nsfwModel = await this.retryLoad(() => nsfwjs.load(), 3);
+            this.nsfwModel = await this.retryLoad(
+                () => nsfwjs.load(), 
+                3,
+                1000,
+                'NSFW'
+            );
             console.log('Model NSFW załadowany!');
             return this.nsfwModel;
         } catch (error) {
@@ -595,12 +612,12 @@ class CensorCraft {
         }
     }
     
-    async retryLoad(loadFn, maxRetries = 3, delayMs = 1000) {
+    async retryLoad(loadFn, maxRetries = 3, delayMs = 1000, modelName = 'Model') {
         for (let i = 0; i < maxRetries; i++) {
             let timeoutId;
             try {
                 const timeoutPromise = new Promise((_, reject) => {
-                    timeoutId = setTimeout(() => reject(new Error('Timeout')), 30000);
+                    timeoutId = setTimeout(() => reject(new Error(`${modelName} load timeout after 30s`)), 30000);
                 });
                 const result = await Promise.race([loadFn(), timeoutPromise]);
                 clearTimeout(timeoutId);
@@ -635,7 +652,7 @@ class CensorCraft {
                 
                 // Disable auto-detection on mobile if image is large
                 const shouldAutoDetect = this.autoDetectCheckbox.checked && 
-                    (!this.isMobileDevice() || (img.width * img.height < 1000000));
+                    (!this.isMobileDevice() || (img.width * img.height < this.MAX_MOBILE_AUTO_DETECT_PIXELS));
                 
                 if (shouldAutoDetect) {
                     setTimeout(() => this.detectAndCensor(), 500);
@@ -1306,9 +1323,9 @@ class CensorCraft {
         const stripeWidth = this.patternConfig.stripeWidth;
         
         for (let x = area.x; x < area.x + area.width; x += stripeWidth * 2) {
-            this.ctx.fillStyle = '#000000';
+            this.ctx.fillStyle = this.patternConfig.stripeColor1;
             this.ctx.fillRect(x, area.y, stripeWidth, area.height);
-            this.ctx.fillStyle = '#FFFFFF';
+            this.ctx.fillStyle = this.patternConfig.stripeColor2;
             this.ctx.fillRect(x + stripeWidth, area.y, stripeWidth, area.height);
         }
         
@@ -1317,7 +1334,7 @@ class CensorCraft {
     
     dotsArea(area) {
         this.ctx.globalAlpha = this.censorOpacity;
-        this.ctx.fillStyle = '#000000';
+        this.ctx.fillStyle = this.patternConfig.dotColor;
         const dotSize = this.patternConfig.dotSize;
         const spacing = this.patternConfig.dotSpacing;
         
@@ -1334,7 +1351,7 @@ class CensorCraft {
     
     gridArea(area) {
         this.ctx.globalAlpha = this.censorOpacity;
-        this.ctx.strokeStyle = '#000000';
+        this.ctx.strokeStyle = this.patternConfig.gridColor;
         this.ctx.lineWidth = 2;
         const gridSize = this.patternConfig.gridSize;
         
