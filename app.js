@@ -1188,11 +1188,11 @@ class CensorCraft {
         // Get the client coordinates from mouse or touch event
         let clientX, clientY;
         if (e.touches && e.touches.length > 0) {
-            // Touch event
+            // Touch event (touchstart, touchmove)
             clientX = e.touches[0].clientX;
             clientY = e.touches[0].clientY;
         } else if (e.changedTouches && e.changedTouches.length > 0) {
-            // Touch end event
+            // Touch end/cancel event (touchend, touchcancel)
             clientX = e.changedTouches[0].clientX;
             clientY = e.changedTouches[0].clientY;
         } else {
