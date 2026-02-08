@@ -5,7 +5,8 @@ class CensorCraft {
         this.ctx = this.canvas.getContext('2d');
         this.overlayCanvas = document.getElementById('overlayCanvas');
         this.overlayCtx = this.overlayCanvas.getContext('2d');
-        this.model = null;
+        this.cocoModel = null;  // For person detection
+        this.nsfwModel = null;  // For NSFW detection
         this.image = null;
         this.originalImage = null;
         this.censorAreas = [];
@@ -34,7 +35,14 @@ class CensorCraft {
         this.historyIndex = -1;
         this.maxHistory = 20;
         
-        // COCO-SSD object categories
+        // NSFW categories for detection
+        this.nsfwCategories = [
+            { id: 'Porn', label: 'Pornografia', description: 'Wyraźne treści seksualne' },
+            { id: 'Hentai', label: 'Hentai', description: 'Animowane treści dla dorosłych' },
+            { id: 'Sexy', label: 'Prowokacyjne', description: 'Sugestywne, ale nie jednoznaczne' }
+        ];
+        
+        // COCO-SSD object categories (for person/object detection mode)
         this.cocoCategories = [
             'person', 'bicycle', 'car', 'motorcycle', 'airplane', 'bus', 'train', 'truck', 'boat',
             'traffic light', 'fire hydrant', 'stop sign', 'parking meter', 'bench', 'bird', 'cat',
@@ -48,7 +56,13 @@ class CensorCraft {
             'refrigerator', 'book', 'clock', 'vase', 'scissors', 'teddy bear', 'hair drier', 'toothbrush'
         ];
         
-        // Selected categories to censor (default: only person)
+        // Detection mode: 'nsfw' or 'objects'
+        this.detectionMode = 'nsfw';
+        
+        // Selected NSFW categories to censor (default: all explicit content)
+        this.selectedNSFWCategories = new Set(['Porn', 'Hentai']);
+        
+        // Selected object categories (for object mode)
         this.selectedCategories = new Set(['person']);
         
         this.initializeElements();
@@ -104,6 +118,9 @@ class CensorCraft {
         this.selectAllCategoriesBtn = document.getElementById('selectAllCategories');
         this.deselectAllCategoriesBtn = document.getElementById('deselectAllCategories');
         this.categoryGrid = document.getElementById('categoryGrid');
+        
+        // Detection mode selector
+        this.detectionModeSelect = document.getElementById('detectionMode');
         
         // Initialize category grid
         this.initializeCategoryGrid();
@@ -235,6 +252,14 @@ class CensorCraft {
         this.selectAllCategoriesBtn.addEventListener('click', () => this.selectAllCategories());
         this.deselectAllCategoriesBtn.addEventListener('click', () => this.deselectAllCategories());
         
+        // Detection mode change
+        this.detectionModeSelect.addEventListener('change', (e) => {
+            this.detectionMode = e.target.value;
+            this.updateUIForDetectionMode();
+            this.initializeCategoryGrid();
+            this.updateCategoryDisplay();
+        });
+        
         // Close modal when clicking outside
         this.categoryModal.addEventListener('click', (e) => {
             if (e.target === this.categoryModal) {
@@ -243,80 +268,141 @@ class CensorCraft {
         });
     }
     
+    updateUIForDetectionMode() {
+        const areaPercentageGroup = document.getElementById('areaPercentageGroup');
+        const categoriesHint = document.getElementById('categoriesHint');
+        const modalTitle = document.getElementById('modalTitle');
+        const modalButtons = document.getElementById('modalButtons');
+        
+        if (this.detectionMode === 'nsfw') {
+            // NSFW mode - hide area percentage (whole image is censored)
+            areaPercentageGroup.style.display = 'none';
+            categoriesHint.textContent = 'Wybierz które treści NSFW mają być cenzurowane';
+            modalTitle.textContent = 'Wybierz Kategorie NSFW do Cenzury';
+            modalButtons.style.display = 'block';
+        } else {
+            // Object detection mode - show area percentage
+            areaPercentageGroup.style.display = 'block';
+            categoriesHint.textContent = 'Wybierz które obiekty mają być cenzurowane';
+            modalTitle.textContent = 'Wybierz Obiekty do Cenzury';
+            modalButtons.style.display = 'block';
+        }
+    }
+    
     initializeCategoryGrid() {
         this.categoryGrid.innerHTML = '';
         
-        // Polish translations for common categories
-        const translations = {
-            'person': 'osoba',
-            'bicycle': 'rower',
-            'car': 'samochód',
-            'motorcycle': 'motocykl',
-            'airplane': 'samolot',
-            'bus': 'autobus',
-            'train': 'pociąg',
-            'truck': 'ciężarówka',
-            'boat': 'łódź',
-            'traffic light': 'światła',
-            'fire hydrant': 'hydrant',
-            'stop sign': 'znak stop',
-            'parking meter': 'parkometr',
-            'bench': 'ławka',
-            'bird': 'ptak',
-            'cat': 'kot',
-            'dog': 'pies',
-            'horse': 'koń',
-            'sheep': 'owca',
-            'cow': 'krowa',
-            'elephant': 'słoń',
-            'bear': 'niedźwiedź',
-            'zebra': 'zebra',
-            'giraffe': 'żyrafa',
-            'backpack': 'plecak',
-            'umbrella': 'parasol',
-            'handbag': 'torebka',
-            'tie': 'krawat',
-            'suitcase': 'walizka',
-            'cell phone': 'telefon'
-        };
-        
-        this.cocoCategories.forEach(category => {
-            const item = document.createElement('div');
-            item.className = 'category-item';
-            if (this.selectedCategories.has(category)) {
-                item.classList.add('selected');
-            }
-            
-            const checkbox = document.createElement('input');
-            checkbox.type = 'checkbox';
-            checkbox.id = `category-${category.replace(/\s+/g, '-')}`;
-            checkbox.checked = this.selectedCategories.has(category);
-            
-            const label = document.createElement('label');
-            label.htmlFor = checkbox.id;
-            const displayName = translations[category] || category;
-            label.textContent = displayName;
-            
-            checkbox.addEventListener('change', () => {
-                this.toggleCategory(category);
-                if (checkbox.checked) {
+        if (this.detectionMode === 'nsfw') {
+            // Show NSFW categories
+            this.nsfwCategories.forEach(category => {
+                const item = document.createElement('div');
+                item.className = 'category-item';
+                if (this.selectedNSFWCategories.has(category.id)) {
                     item.classList.add('selected');
-                } else {
-                    item.classList.remove('selected');
                 }
+                
+                const checkbox = document.createElement('input');
+                checkbox.type = 'checkbox';
+                checkbox.id = `category-${category.id}`;
+                checkbox.checked = this.selectedNSFWCategories.has(category.id);
+                
+                const label = document.createElement('label');
+                label.htmlFor = checkbox.id;
+                label.innerHTML = `<strong>${category.label}</strong><br><small style="color: #666;">${category.description}</small>`;
+                
+                checkbox.addEventListener('change', () => {
+                    this.toggleNSFWCategory(category.id);
+                    if (checkbox.checked) {
+                        item.classList.add('selected');
+                    } else {
+                        item.classList.remove('selected');
+                    }
+                });
+                
+                item.addEventListener('click', (e) => {
+                    if (e.target !== checkbox) {
+                        checkbox.checked = !checkbox.checked;
+                        checkbox.dispatchEvent(new Event('change'));
+                    }
+                });
+                
+                item.appendChild(checkbox);
+                item.appendChild(label);
+                this.categoryGrid.appendChild(item);
             });
+        } else {
+            // Show object categories
+            const translations = {
+                'person': 'osoba',
+                'bicycle': 'rower',
+                'car': 'samochód',
+                'motorcycle': 'motocykl',
+                'airplane': 'samolot',
+                'bus': 'autobus',
+                'train': 'pociąg',
+                'truck': 'ciężarówka',
+                'boat': 'łódź',
+                'traffic light': 'światła',
+                'fire hydrant': 'hydrant',
+                'stop sign': 'znak stop',
+                'parking meter': 'parkometr',
+                'bench': 'ławka',
+                'bird': 'ptak',
+                'cat': 'kot',
+                'dog': 'pies',
+                'horse': 'koń',
+                'sheep': 'owca',
+                'cow': 'krowa',
+                'elephant': 'słoń',
+                'bear': 'niedźwiedź',
+                'zebra': 'zebra',
+                'giraffe': 'żyrafa',
+                'backpack': 'plecak',
+                'umbrella': 'parasol',
+                'handbag': 'torebka',
+                'tie': 'krawat',
+                'suitcase': 'walizka',
+                'cell phone': 'telefon'
+            };
             
-            item.addEventListener('click', (e) => {
-                if (e.target !== checkbox) {
-                    checkbox.checked = !checkbox.checked;
-                    checkbox.dispatchEvent(new Event('change'));
+            this.cocoCategories.forEach(category => {
+                const item = document.createElement('div');
+                item.className = 'category-item';
+                if (this.selectedCategories.has(category)) {
+                    item.classList.add('selected');
                 }
+                
+                const checkbox = document.createElement('input');
+                checkbox.type = 'checkbox';
+                checkbox.id = `category-${category.replace(/\s+/g, '-')}`;
+                checkbox.checked = this.selectedCategories.has(category);
+                
+                const label = document.createElement('label');
+                label.htmlFor = checkbox.id;
+                const displayName = translations[category] || category;
+                label.textContent = displayName;
+                
+                checkbox.addEventListener('change', () => {
+                    this.toggleCategory(category);
+                    if (checkbox.checked) {
+                        item.classList.add('selected');
+                    } else {
+                        item.classList.remove('selected');
+                    }
+                });
+                
+                item.addEventListener('click', (e) => {
+                    if (e.target !== checkbox) {
+                        checkbox.checked = !checkbox.checked;
+                        checkbox.dispatchEvent(new Event('change'));
+                    }
+                });
+                
+                item.appendChild(checkbox);
+                item.appendChild(label);
+                this.categoryGrid.appendChild(item);
             });
-            
-            item.appendChild(checkbox);
-            item.appendChild(label);
-            this.categoryGrid.appendChild(item);
-        });
+        }
     }
     
     openCategoryModal() {
@@ -346,16 +432,25 @@ class CensorCraft {
     async loadModel() {
         try {
             this.showLoading(true);
-            console.log('Ładowanie modelu COCO-SSD...');
-            this.model = await cocoSsd.load();
-            console.log('Model załadowany pomyślnie!');
+            console.log('Ładowanie modeli AI...');
+            
+            // Load both models in parallel
+            const [cocoModel, nsfwModel] = await Promise.all([
+                cocoSsd.load(),
+                nsfwjs.load()
+            ]);
+            
+            this.cocoModel = cocoModel;
+            this.nsfwModel = nsfwModel;
+            
+            console.log('Modele załadowane pomyślnie!');
             this.showLoading(false);
             
             // Update category display after loading
             this.updateCategoryDisplay();
         } catch (error) {
-            console.error('Błąd ładowania modelu:', error);
-            alert('Nie udało się załadować modelu AI. Sprawdź połączenie internetowe.');
+            console.error('Błąd ładowania modeli:', error);
+            alert('Nie udało się załadować modeli AI. Sprawdź połączenie internetowe.');
             this.showLoading(false);
         }
     }
@@ -658,15 +753,78 @@ class CensorCraft {
     }
 
     async detectAndCensor() {
-        if (!this.model) {
-            alert('Model AI nie jest jeszcze załadowany. Proszę czekać...');
+        if (this.detectionMode === 'nsfw') {
+            await this.detectNSFW();
+        } else {
+            await this.detectObjects();
+        }
+    }
+    
+    async detectNSFW() {
+        if (!this.nsfwModel) {
+            alert('Model NSFW nie jest jeszcze załadowany. Proszę czekać...');
             return;
         }
 
         this.showLoading(true);
         
         try {
-            const predictions = await this.model.detect(this.canvas);
+            // NSFWJS classifies the entire image
+            const predictions = await this.nsfwModel.classify(this.canvas);
+            console.log('Predykcje NSFW:', predictions);
+            
+            // Find predictions matching selected categories
+            const nsfwDetected = predictions.filter(p => 
+                this.selectedNSFWCategories.has(p.className)
+            );
+            
+            if (nsfwDetected.length === 0) {
+                const categoriesText = Array.from(this.selectedNSFWCategories)
+                    .map(cat => this.nsfwCategories.find(c => c.id === cat)?.label || cat)
+                    .join(', ');
+                alert(`Nie wykryto treści NSFW (${categoriesText}) na tym zdjęciu.`);
+            } else {
+                // NSFW model classifies whole image, so censor the entire image
+                // or we can censor based on confidence threshold
+                const highestNSFW = nsfwDetected[0];
+                const confidenceThreshold = this.confidenceSlider.value / 100;
+                
+                if (highestNSFW.probability >= confidenceThreshold) {
+                    // Censor entire image
+                    this.censorAreas.push({
+                        x: 0,
+                        y: 0,
+                        width: this.canvas.width,
+                        height: this.canvas.height
+                    });
+                    
+                    this.saveState();
+                    this.applyCensorship();
+                    
+                    const categoryLabel = this.nsfwCategories.find(c => c.id === highestNSFW.className)?.label || highestNSFW.className;
+                    alert(`Wykryto treści: ${categoryLabel} (${Math.round(highestNSFW.probability * 100)}% pewności)`);
+                } else {
+                    alert(`Wykryto treści NSFW, ale poniżej progu pewności (${Math.round(highestNSFW.probability * 100)}% < ${Math.round(confidenceThreshold * 100)}%)`);
+                }
+            }
+        } catch (error) {
+            console.error('Błąd wykrywania NSFW:', error);
+            alert('Wystąpił błąd podczas wykrywania treści NSFW.');
+        } finally {
+            this.showLoading(false);
+        }
+    }
+    
+    async detectObjects() {
+        if (!this.cocoModel) {
+            alert('Model wykrywania obiektów nie jest jeszcze załadowany. Proszę czekać...');
+            return;
+        }
+
+        this.showLoading(true);
+        
+        try {
+            const predictions = await this.cocoModel.detect(this.canvas);
             console.log('Wykryto obiekty:', predictions);
 
             const confidenceThreshold = this.confidenceSlider.value / 100;
