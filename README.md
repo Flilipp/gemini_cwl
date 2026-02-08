@@ -1,5 +1,7 @@
 # Project: CensorCraft (lub inna nazwa, którą wybierzesz)
 
+# https://censouircraft.web.app/
+
 **Darmowe, open-source'owe i w 100% prywatne narzędzie do automatycznej cenzury, które działa w Twojej przeglądarce.**
 
 [![Status Projektu: MVP Ukończone](https://img.shields.io/badge/status-MVP%20ukończone-green.svg)](https://github.com/Flilipp/gemini_cwl)
