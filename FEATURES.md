@@ -1,154 +1,154 @@
-# Funkcje CensorCraft - Pełna Lista
+# CensorCraft Features - Complete List
 
-## ✅ Zaimplementowane Funkcje (MVP - Faza 1)
+## ✅ Implemented Features (MVP - Phase 1)
 
-### 🖼️ Podstawowe Funkcje Obrazów
+### 🖼️ Basic Image Features
 
-- [x] **Upload obrazów** - obsługa plików JPG, PNG, GIF
-- [x] **Drag & Drop** - przeciągnij i upuść obraz
-- [x] **Kliknij aby wybrać** - klasyczne okno wyboru pliku
-- [x] **Automatyczne skalowanie** - dopasowanie obrazu do ekranu (max 800x600px)
-- [x] **Zachowanie proporcji** - obraz nie jest zniekształcany
+- [x] **Image upload** - supports JPG, PNG, GIF files
+- [x] **Drag & Drop** - drag and drop images
+- [x] **Click to select** - classic file selection dialog
+- [x] **Automatic scaling** - fit image to screen (max 800x600px)
+- [x] **Maintain proportions** - image is not distorted
 
-### 🤖 Sztuczna Inteligencja
+### 🤖 Artificial Intelligence
 
-- [x] **TensorFlow.js** - framework ML działający w przeglądarce
-- [x] **COCO-SSD Model** - wykrywanie 90 klas obiektów
-- [x] **Detekcja osób** - automatyczne wykrywanie ludzi na zdjęciu
-- [x] **Inteligentne kadrowanie** - cenzura skupia się na głowie (górne 30% wykrytej osoby)
-- [x] **Automatyczne uruchamianie** - opcjonalne auto-wykrywanie po wgraniu zdjęcia
+- [x] **TensorFlow.js** - ML framework running in browser
+- [x] **COCO-SSD Model** - detecting 90 object classes
+- [x] **Person detection** - automatic detection of people in photos
+- [x] **Smart cropping** - censorship focuses on head (top 30% of detected person)
+- [x] **Automatic start** - optional auto-detection after uploading image
 
-### 🎨 Style Cenzury
+### 🎨 Censorship Styles
 
-- [x] **Czarny Pasek** - klasyczna cenzura czarnymi prostokątami
-- [x] **Pikselizacja** - efekt rozmytych pikseli (20x20px bloki)
-- [x] **Rozmycie** - gaussowskie rozmycie obszaru (blur 25px)
-- [x] **Emoji** - cenzura przy użyciu emotikon 😎
-- [x] **Biały Pasek** - cenzura białymi prostokątami
-- [x] **Własna Tekstura** - użyj własnego obrazu jako wzoru cenzury
-- [x] **Przełączanie stylów** - zmiana stylu w locie
-- [x] **Wielokrotne obszary** - możliwość cenzury wielu obszarów jednocześnie
+- [x] **Black Bar** - classic censorship with black rectangles
+- [x] **Pixelation** - blurred pixel effect (20x20px blocks)
+- [x] **Blur** - Gaussian blur of area (blur 25px)
+- [x] **Emoji** - censorship using emoticons 😎
+- [x] **White Bar** - censorship with white rectangles
+- [x] **Custom Texture** - use your own image as censorship pattern
+- [x] **Style switching** - change style on the fly
+- [x] **Multiple areas** - ability to censor multiple areas at once
 
-### ✏️ Edycja Ręczna i Zaawansowana
+### ✏️ Manual and Advanced Editing
 
-- [x] **Tryb rysowania** - ręczne zaznaczanie obszarów do cenzury
-- [x] **Rysowanie prostokątów** - kliknij i przeciągnij
-- [x] **Rysowanie łuków i krzywych** - łącz punkty tworząc płynne krzywe cenzury
-- [x] **Podgląd na żywo** - pokazuje obszar podczas rysowania
-- [x] **Wielokrotne obszary** - dodawaj tyle obszarów ile chcesz
-- [x] **Łączenie AI + ręczne** - użyj obu metod jednocześnie
-- [x] **Przycinanie obrazu** - tryb crop do wycinania fragmentów obrazu
-- [x] **Obrót obrazu** - 90°, 180°, 270°
-- [x] **Odbicie lustrzane** - poziome i pionowe
-- [x] **Jasność** - regulacja jasności obrazu (-100 do +100)
-- [x] **Kontrast** - regulacja kontrastu (0-200%)
-- [x] **Nasycenie** - regulacja nasycenia kolorów (0-200%)
-- [x] **Ostrość** - wyostrzanie lub łagodzenie obrazu
-- [x] **Winietowanie** - przyciemnianie brzegów obrazu
-- [x] **Temperatura kolorów** - cieplejsze/chłodniejsze tony
-- [x] **Filtry kolorów** - czarno-biały, sepia, inwersja, brak
-- [x] **Cofnij/Ponów** - pełna historia zmian (do 20 kroków)
+- [x] **Drawing mode** - manually mark areas to censor
+- [x] **Draw rectangles** - click and drag
+- [x] **Draw arcs and curves** - connect points creating smooth censorship curves
+- [x] **Live preview** - shows area while drawing
+- [x] **Multiple areas** - add as many areas as you want
+- [x] **Combine AI + manual** - use both methods simultaneously
+- [x] **Image cropping** - crop mode for cutting out image fragments
+- [x] **Image rotation** - 90°, 180°, 270°
+- [x] **Mirror flip** - horizontal and vertical
+- [x] **Brightness** - adjust image brightness (-100 to +100)
+- [x] **Contrast** - adjust contrast (0-200%)
+- [x] **Saturation** - adjust color saturation (0-200%)
+- [x] **Sharpness** - sharpen or soften image
+- [x] **Vignette** - darken image edges
+- [x] **Color temperature** - warmer/cooler tones
+- [x] **Color filters** - grayscale, sepia, inversion, none
+- [x] **Undo/Redo** - full change history (up to 20 steps)
 
-### 💾 Zapis i Eksport
+### 💾 Save and Export
 
-- [x] **Pobierz obraz** - zapisz ocenzurowany obraz jako PNG
-- [x] **Zachowanie jakości** - bez straty jakości
-- [x] **Nazwa pliku** - `censored-image.png`
-- [x] **Natychmiastowy download** - jedno kliknięcie
+- [x] **Download image** - save censored image as PNG
+- [x] **Preserve quality** - no quality loss
+- [x] **File name** - `censored-image.png`
+- [x] **Instant download** - one click
 
-### 🔧 Kontrola i Narzędzia
+### 🔧 Control and Tools
 
-- [x] **Wyczyść wszystko** - usuń wszystkie obszary cenzury
-- [x] **Nowy obraz** - załaduj nowy obraz
-- [x] **Włącz/wyłącz auto-detekcję** - checkbox
-- [x] **Przełączanie trybu rysowania** - przycisk
+- [x] **Clear all** - remove all censorship areas
+- [x] **New image** - load new image
+- [x] **Enable/disable auto-detection** - checkbox
+- [x] **Toggle drawing mode** - button
 
-### 🎯 Interfejs Użytkownika
+### 🎯 User Interface
 
-- [x] **Responsywny design** - działa na desktop i mobile
-- [x] **Gradientowe tło** - piękny wygląd
-- [x] **Animacje** - smooth transitions
-- [x] **Loading spinner** - podczas ładowania modelu
-- [x] **Ikony** - wizualne wskaźniki
-- [x] **Tooltips/wskazówki** - pomoc dla użytkownika
-- [x] **System zakładek** - organizacja kontroli (Cenzura, Regulacje, Efekty, Transformacje)
-- [x] **Historia zmian** - przyciski cofnij/ponów
-- [x] **Przyciski efektów** - szybki dostęp do filtrów i transformacji
+- [x] **Responsive design** - works on desktop and mobile
+- [x] **Gradient background** - beautiful appearance
+- [x] **Animations** - smooth transitions
+- [x] **Loading spinner** - while loading model
+- [x] **Icons** - visual indicators
+- [x] **Tooltips/hints** - user help
+- [x] **Tab system** - control organization (Censorship, Adjustments, Effects, Transformations)
+- [x] **Change history** - undo/redo buttons
+- [x] **Effect buttons** - quick access to filters and transformations
 
-### 🔒 Prywatność i Bezpieczeństwo
+### 🔒 Privacy and Security
 
-- [x] **Przetwarzanie lokalne** - 100% client-side
-- [x] **Brak wysyłania danych** - zero komunikacji z serwerem
-- [x] **Brak cookies** - zero śledzenia
-- [x] **Brak analytics** - pełna prywatność
-- [x] **Open source** - kod dostępny publicznie
+- [x] **Local processing** - 100% client-side
+- [x] **No data sending** - zero server communication
+- [x] **No cookies** - zero tracking
+- [x] **No analytics** - full privacy
+- [x] **Open source** - publicly available code
 
-### 📱 Kompatybilność
+### 📱 Compatibility
 
-- [x] **Chrome 80+** - pełne wsparcie
-- [x] **Firefox 75+** - pełne wsparcie
-- [x] **Safari 13+** - pełne wsparcie
-- [x] **Edge 80+** - pełne wsparcie
-- [x] **Mobile browsers** - responsywny layout
+- [x] **Chrome 80+** - full support
+- [x] **Firefox 75+** - full support
+- [x] **Safari 13+** - full support
+- [x] **Edge 80+** - full support
+- [x] **Mobile browsers** - responsive layout
 
 ---
 
-## 🚧 Planowane Funkcje (Faza 2 i 3)
+## 🚧 Planned Features (Phase 2 and 3)
 
-### Faza 2: Rozbudowa Funkcji ✅ UKOŃCZONE!
+### Phase 2: Feature Expansion ✅ COMPLETE!
 
-- [x] **Więcej stylów cenzury**
+- [x] **More censorship styles**
   - [x] Emoji overlay ✅
-  - [x] Biały pasek ✅
-  - [ ] Custom obrazy/wzory
-  - [ ] Efekt "glitch"
+  - [x] White bar ✅
+  - [ ] Custom images/patterns
+  - [ ] "Glitch" effect
   - [ ] Gradient blur
   
-- [x] **Zaawansowana edycja** ✅
-  - [x] Przycinanie obrazu (crop) ✅
-  - [x] Rotacja obrazu ✅
-  - [x] Odbicie lustrzane ✅
-  - [x] Cofnij/Ponów (undo/redo) ✅
-  - [x] Historia zmian ✅
-  - [x] Regulacja jasności ✅
-  - [x] Regulacja kontrastu ✅
-  - [x] Regulacja nasycenia ✅
-  - [x] Ostrość ✅
-  - [x] Winietowanie ✅
-  - [x] Temperatura kolorów ✅
-  - [x] Filtry kolorów (czarno-biały, sepia, inwersja) ✅
+- [x] **Advanced editing** ✅
+  - [x] Image cropping (crop) ✅
+  - [x] Image rotation ✅
+  - [x] Mirror flip ✅
+  - [x] Undo/Redo ✅
+  - [x] Change history ✅
+  - [x] Brightness adjustment ✅
+  - [x] Contrast adjustment ✅
+  - [x] Saturation adjustment ✅
+  - [x] Sharpness ✅
+  - [x] Vignette ✅
+  - [x] Color temperature ✅
+  - [x] Color filters (grayscale, sepia, inversion) ✅
   
-- [x] **Ulepszony interfejs** ✅
-  - [x] System zakładek dla organizacji kontroli ✅
-  - [x] Przyciski cofnij/ponów ✅
-  - [ ] Zapisywanie preferencji (localStorage)
-  - [ ] Motywy kolorystyczne (light/dark)
+- [x] **Improved interface** ✅
+  - [x] Tab system for control organization ✅
+  - [x] Undo/redo buttons ✅
+  - [ ] Save preferences (localStorage)
+  - [ ] Color themes (light/dark)
 
-### Faza 3: Dalszy Rozwój
+### Phase 3: Further Development
 
-- [ ] **Wsparcie wideo**
-  - [ ] Upload plików MP4, WebM
-  - [ ] Wykrywanie w wideo frame-by-frame
-  - [ ] Cenzura w czasie rzeczywistym
-  - [ ] Eksport ocenzurowanego wideo
+- [ ] **Video support**
+  - [ ] Upload MP4, WebM files
+  - [ ] Frame-by-frame video detection
+  - [ ] Real-time censorship
+  - [ ] Export censored video
   
-- [ ] **Wsparcie GIF**
-  - [ ] Animowane GIF'y
-  - [ ] Cenzura w każdej klatce
-  - [ ] Eksport do GIF
+- [ ] **GIF support**
+  - [ ] Animated GIFs
+  - [ ] Censorship in each frame
+  - [ ] Export to GIF
   
 - [ ] **Batch processing**
-  - [ ] Wiele plików naraz
-  - [ ] Automatyczne przetwarzanie
+  - [ ] Multiple files at once
+  - [ ] Automatic processing
   - [ ] ZIP download
   
-- [ ] **Zaawansowane AI**
-  - [ ] Różne modele ML
-  - [ ] Wykrywanie tekstu (OCR)
-  - [ ] Wykrywanie tablic rejestracyjnych
-  - [ ] Custom modele użytkownika
+- [ ] **Advanced AI**
+  - [ ] Different ML models
+  - [ ] Text detection (OCR)
+  - [ ] License plate detection
+  - [ ] Custom user models
 
-- [ ] **Optymalizacja**
+- [ ] **Optimization**
   - [ ] Web Workers
   - [ ] WebGL acceleration
   - [ ] Progressive Web App (PWA)
@@ -156,58 +156,58 @@
 
 ---
 
-## 📊 Statystyki Implementacji
+## 📊 Implementation Statistics
 
-### Kod
-- **HTML**: 232 linii
-- **JavaScript**: 900+ linii
-- **CSS**: 400+ linii
-- **TOTAL**: 1532+ linii kodu
+### Code
+- **HTML**: 232 lines
+- **JavaScript**: 900+ lines
+- **CSS**: 400+ lines
+- **TOTAL**: 1532+ lines of code
 
-### Pliki
-- `index.html` - główny interfejs
-- `app.js` - logika aplikacji
-- `styles.css` - stylowanie
-- `INSTRUKCJA.md` - dokumentacja użytkownika
-- `DEVELOPER.md` - dokumentacja dewelopera
-- `README.md` - opis projektu
-- `.gitignore` - konfiguracja git
+### Files
+- `index.html` - main interface
+- `app.js` - application logic
+- `styles.css` - styling
+- `README.md` - project description
+- `FEATURES.md` - feature list
+- `test_features.md` - test plan
+- `.gitignore` - git configuration
 
-### Biblioteki Zewnętrzne
+### External Libraries
 - TensorFlow.js 4.11.0
 - COCO-SSD Model 2.2.3
 
-### Rozmiar
-- **Total size**: ~27KB (bez bibliotek)
-- **With libraries**: ~5MB (pierwsze załadowanie)
-- **Cached**: ~27KB (kolejne wizyty)
+### Size
+- **Total size**: ~27KB (without libraries)
+- **With libraries**: ~5MB (first load)
+- **Cached**: ~27KB (subsequent visits)
 
 ---
 
-## 🎯 Zgodność z README.md
+## 🎯 Compliance with README.md
 
-Wszystkie funkcje z **Fazy 1 (MVP)** z README.md zostały zaimplementowane:
+All features from **Phase 1 (MVP)** from README.md have been implemented:
 
-✅ Stworzenie podstawowego interfejsu do wgrywania zdjęć  
-✅ Implementacja jednego, podstawowego modelu AI do wykrywania  
-✅ Dodanie opcji cenzury (czarny pasek + bonus: pixelate, blur)  
-✅ Opcja pobrania ocenzurowanego obrazu  
+✅ Create basic interface for uploading images  
+✅ Implement one basic AI model for detection  
+✅ Add censorship option (black bar + bonus: pixelate, blur)  
+✅ Option to download censored image  
 
-**BONUS** - dodatkowo zaimplementowano:
-- ✨ Tryb ręcznego rysowania
-- ✨ 3 style cenzury zamiast 1
+**BONUS** - additionally implemented:
+- ✨ Manual drawing mode
+- ✨ 3 censorship styles instead of 1
 - ✨ Drag & drop upload
-- ✨ Responsywny design
-- ✨ Pełna dokumentacja (PL)
+- ✨ Responsive design
+- ✨ Complete documentation (EN)
 
 ---
 
-## 🏆 Gotowe do Użycia!
+## 🏆 Ready to Use!
 
-Aplikacja jest w pełni funkcjonalna i gotowa do:
-- ✅ Używania przez użytkowników końcowych
-- ✅ Deploymentu na hosting
-- ✅ Dalszego rozwoju przez społeczność
-- ✅ Dodawania nowych funkcji
+The application is fully functional and ready for:
+- ✅ Use by end users
+- ✅ Deployment to hosting
+- ✅ Further development by community
+- ✅ Adding new features
 
-**CensorCraft MVP jest ukończony!** 🎉
+**CensorCraft MVP is complete!** 🎉

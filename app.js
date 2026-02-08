@@ -50,9 +50,9 @@ class CensorCraft {
         
         // NSFW categories for detection
         this.nsfwCategories = [
-            { id: 'Porn', label: 'Pornografia', description: 'Wyraźne treści seksualne' },
-            { id: 'Hentai', label: 'Hentai', description: 'Animowane treści dla dorosłych' },
-            { id: 'Sexy', label: 'Prowokacyjne', description: 'Sugestywne, ale nie jednoznaczne' }
+            { id: 'Porn', label: 'Pornography', description: 'Explicit sexual content' },
+            { id: 'Hentai', label: 'Hentai', description: 'Animated adult content' },
+            { id: 'Sexy', label: 'Suggestive', description: 'Suggestive but not explicit' }
         ];
         
         // Body parts for Beta community censorship
@@ -62,16 +62,16 @@ class CensorCraft {
         // 12,13: torso front/back | 14,15: left/right upper leg front | 16,17: left/right upper leg back
         // 18,19: left/right lower leg front | 20,21: left/right lower leg back | 22,23: left/right foot
         this.bodyParts = [
-            { id: 'face', label: 'Twarz', description: 'Cała twarz', bodyPixParts: [0, 1] },
-            { id: 'eyes', label: 'Oczy', description: 'Tylko oczy (górna część twarzy)', bodyPixParts: [0, 1], customMask: 'upper-face' },  // Will use custom logic for upper portion
-            { id: 'chest', label: 'Piersi/Klatka', description: 'Obszar klatki piersiowej', bodyPixParts: [12] },  // torso front only
-            { id: 'hands', label: 'Ręce/Dłonie', description: 'Dłonie i przedramiona', bodyPixParts: [6, 7, 8, 9, 10, 11] },  // arms and hands
-            { id: 'armpits', label: 'Pachy', description: 'Obszar pod pachami', bodyPixParts: [4, 5] },  // upper arm front
-            { id: 'navel', label: 'Brzuch/Pępek', description: 'Brzuch i okolice pępka', bodyPixParts: [12], customMask: 'lower-torso' },  // Lower part of torso front
-            { id: 'genitals', label: 'Genitalia', description: 'Obszar intymny', bodyPixParts: [14, 15, 16, 17] },  // upper legs (groin area)
-            { id: 'feet', label: 'Stopy', description: 'Stopy', bodyPixParts: [22, 23] },  // feet only
-            { id: 'legs', label: 'Nogi', description: 'Całe nogi (bez stóp)', bodyPixParts: [14, 15, 16, 17, 18, 19, 20, 21] },  // all leg parts
-            { id: 'buttocks', label: 'Pośladki', description: 'Tyłek', bodyPixParts: [13, 16, 17] }  // torso back + upper legs back
+            { id: 'face', label: 'Face', description: 'Full face', bodyPixParts: [0, 1] },
+            { id: 'eyes', label: 'Eyes', description: 'Eyes only (upper face)', bodyPixParts: [0, 1], customMask: 'upper-face' },  // Will use custom logic for upper portion
+            { id: 'chest', label: 'Chest/Breast', description: 'Chest area', bodyPixParts: [12] },  // torso front only
+            { id: 'hands', label: 'Hands', description: 'Hands and forearms', bodyPixParts: [6, 7, 8, 9, 10, 11] },  // arms and hands
+            { id: 'armpits', label: 'Armpits', description: 'Armpit area', bodyPixParts: [4, 5] },  // upper arm front
+            { id: 'navel', label: 'Belly/Navel', description: 'Belly and navel area', bodyPixParts: [12], customMask: 'lower-torso' },  // Lower part of torso front
+            { id: 'genitals', label: 'Genitals', description: 'Intimate area', bodyPixParts: [14, 15, 16, 17] },  // upper legs (groin area)
+            { id: 'feet', label: 'Feet', description: 'Feet', bodyPixParts: [22, 23] },  // feet only
+            { id: 'legs', label: 'Legs', description: 'Full legs (without feet)', bodyPixParts: [14, 15, 16, 17, 18, 19, 20, 21] },  // all leg parts
+            { id: 'buttocks', label: 'Buttocks', description: 'Buttocks', bodyPixParts: [13, 16, 17] }  // torso back + upper legs back
         ];
         
         // Detection mode: 'nsfw' or 'bodyparts'
@@ -566,10 +566,10 @@ class CensorCraft {
                 1000,
                 'BodyPix'
             );
-            console.log('Model BodyPix załadowany!');
+            console.log('BodyPix model loaded!');
             return this.bodyPixModel;
         } catch (error) {
-            console.error('Błąd ładowania modelu BodyPix:', error);
+            console.error('Error loading BodyPix model:', error);
             throw error;
         } finally {
             this.bodyPixLoading = false;
@@ -597,10 +597,10 @@ class CensorCraft {
                 1000,
                 'NSFW'
             );
-            console.log('Model NSFW załadowany!');
+            console.log('NSFW model loaded!');
             return this.nsfwModel;
         } catch (error) {
-            console.error('Błąd ładowania modelu NSFW:', error);
+            console.error('Error loading NSFW model:', error);
             throw error;
         } finally {
             this.nsfwLoading = false;
@@ -624,7 +624,7 @@ class CensorCraft {
             this.showLoading(false);
             this.updateCategoryDisplay();
         } catch (error) {
-            console.error('Błąd ładowania modeli:', error);
+            console.error('Error loading models:', error);
             this.showLoading(false);
             throw error;
         } finally {
@@ -644,7 +644,7 @@ class CensorCraft {
                 return result;
             } catch (error) {
                 if (timeoutId) clearTimeout(timeoutId);
-                console.warn(`Próba ${i + 1}/${maxRetries} nie powiodła się:`, error.message);
+                console.warn(`Attempt ${i + 1}/${maxRetries} failed:`, error.message);
                 if (i === maxRetries - 1) throw error;
                 await new Promise(resolve => setTimeout(resolve, delayMs * (i + 1)));
             }
@@ -677,7 +677,7 @@ class CensorCraft {
                 if (shouldAutoDetect) {
                     setTimeout(() => this.detectAndCensor(), 500);
                 } else if (this.isMobileDevice() && this.autoDetectCheckbox.checked) {
-                    console.log('Auto-detection wyłączone dla dużych obrazów na urządzeniach mobilnych');
+                    console.log('Auto-detection disabled for large images on mobile devices');
                 }
             };
             img.src = e.target.result;
@@ -970,11 +970,11 @@ class CensorCraft {
             // Ensure NSFW model is loaded
             await this.ensureNSFWLoaded();
             
-            this.showLoading(true, 'Wykrywanie treści NSFW...');
+            this.showLoading(true, 'Detecting NSFW content...');
             
             // NSFWJS classifies the entire image
             const predictions = await this.nsfwModel.classify(this.canvas);
-            console.log('Predykcje NSFW:', predictions);
+            console.log('NSFW predictions:', predictions);
             
             // Find predictions matching selected categories
             const nsfwDetected = predictions.filter(p => 
@@ -985,7 +985,7 @@ class CensorCraft {
                 const categoriesText = Array.from(this.selectedNSFWCategories)
                     .map(cat => this.nsfwCategories.find(c => c.id === cat)?.label || cat)
                     .join(', ');
-                alert(`Nie wykryto treści NSFW (${categoriesText}) na tym zdjęciu.`);
+                alert(`No NSFW content (${categoriesText}) detected in this image.`);
             } else {
                 // NSFW model classifies whole image, so censor the entire image
                 const highestNSFW = nsfwDetected[0];
@@ -1004,23 +1004,23 @@ class CensorCraft {
                     this.applyCensorship();
                     
                     const categoryLabel = this.nsfwCategories.find(c => c.id === highestNSFW.className)?.label || highestNSFW.className;
-                    alert(`Wykryto treści: ${categoryLabel} (${Math.round(highestNSFW.probability * 100)}% pewności)`);
+                    alert(`Content detected: ${categoryLabel} (${Math.round(highestNSFW.probability * 100)}% confidence)`);
                 } else {
-                    alert(`Wykryto treści NSFW, ale poniżej progu pewności (${Math.round(highestNSFW.probability * 100)}% < ${Math.round(confidenceThreshold * 100)}%)`);
+                    alert(`NSFW content detected but below confidence threshold (${Math.round(highestNSFW.probability * 100)}% < ${Math.round(confidenceThreshold * 100)}%)`);
                 }
             }
         } catch (error) {
-            console.error('Błąd wykrywania NSFW:', error);
-            let errorMessage = 'Wystąpił błąd podczas wykrywania treści NSFW.';
+            console.error('NSFW detection error:', error);
+            let errorMessage = 'An error occurred while detecting NSFW content.';
             
             // Check for network-related errors
             if (error instanceof TypeError || 
                 (error.message && (error.message.toLowerCase().includes('fetch') || 
                                    error.message.toLowerCase().includes('network') ||
                                    error.message.toLowerCase().includes('load')))) {
-                errorMessage += '\n\nProblem z połączeniem sieciowym. Sprawdź połączenie internetowe i spróbuj ponownie.';
+                errorMessage += '\n\nNetwork connection problem. Check your internet connection and try again.';
             } else if (error.message) {
-                errorMessage += `\n\nSzczegóły: ${error.message}`;
+                errorMessage += `\n\nDetails: ${error.message}`;
             }
             alert(errorMessage);
         } finally {
@@ -1030,24 +1030,24 @@ class CensorCraft {
     
     async detectBodyParts() {
         if (this.selectedBodyParts.size === 0) {
-            alert('Wybierz przynajmniej jedną część ciała do cenzury.');
+            alert('Select at least one body part to censor.');
             return;
         }
 
-        this.showLoading(true, 'Ładowanie modelu BodyPix...');
+        this.showLoading(true, 'Loading BodyPix model...');
         
         try {
             // Ensure BodyPix model is loaded
             await this.ensureBodyPixLoaded();
             
-            this.showLoading(true, 'Wykrywanie części ciała...');
+            this.showLoading(true, 'Detecting body parts...');
             
             // Perform body part segmentation
             const segmentation = await this.bodyPixModel.segmentPersonParts(this.canvas);
-            console.log('Segmentacja części ciała:', segmentation);
+            console.log('Body part segmentation:', segmentation);
             
             if (!segmentation || segmentation.allPoses.length === 0) {
-                alert('Nie wykryto osoby na zdjęciu.');
+                alert('No person detected in the image.');
                 this.showLoading(false);
                 return;
             }
@@ -1102,15 +1102,15 @@ class CensorCraft {
             });
             
             if (this.censorAreas.length === 0) {
-                alert('Nie wykryto wybranych części ciała na zdjęciu.');
+                alert('Selected body parts not detected in the image.');
             } else {
                 this.saveState();
                 this.applyCensorship();
-                alert(`Wykryto i ocenzurowano ${Object.keys(partMasks).length} części ciała.`);
+                alert(`Detected and censored ${Object.keys(partMasks).length} body parts.`);
             }
         } catch (error) {
-            console.error('Błąd wykrywania części ciała:', error);
-            alert('Wystąpił błąd podczas wykrywania części ciała.');
+            console.error('Body part detection error:', error);
+            alert('An error occurred while detecting body parts.');
         } finally {
             this.showLoading(false);
         }
@@ -1127,13 +1127,13 @@ class CensorCraft {
         
         if (this.drawMode) {
             wrapper.classList.add('draw-mode');
-            this.drawModeBtn.textContent = '🛑 Wyłącz Tryb Rysowania';
+            this.drawModeBtn.textContent = '🛑 Disable Drawing Mode';
             this.drawModeBtn.style.background = '#dc3545';
             this.drawModeBtn.style.color = 'white';
             this.drawModeBtn.style.borderColor = '#dc3545';
         } else {
             wrapper.classList.remove('draw-mode');
-            this.drawModeBtn.textContent = '✏️ Rysuj Obszar Cenzury';
+            this.drawModeBtn.textContent = '✏️ Draw Censorship Area';
             this.drawModeBtn.style.background = '';
             this.drawModeBtn.style.color = '';
             this.drawModeBtn.style.borderColor = '';
@@ -1151,16 +1151,16 @@ class CensorCraft {
         
         if (this.arcMode) {
             wrapper.classList.add('draw-mode');
-            this.arcModeBtn.textContent = '🛑 Zakończ Rysowanie Łuków';
+            this.arcModeBtn.textContent = '🛑 Finish Drawing Arcs';
             this.arcModeBtn.style.background = '#dc3545';
             this.arcModeBtn.style.color = 'white';
             this.arcModeBtn.style.borderColor = '#dc3545';
             // Clear previous arc points
             this.arcPoints = [];
-            alert('Tryb rysowania łuków: Klikaj aby dodać punkty, rysuj łuki między nimi. Kliknij ponownie aby zakończyć.');
+            alert('Arc drawing mode: Click to add points, draw arcs between them. Click again to finish.');
         } else {
             wrapper.classList.remove('draw-mode');
-            this.arcModeBtn.textContent = '🌙 Rysuj Łuki i Krzywe';
+            this.arcModeBtn.textContent = '🌙 Draw Arcs and Curves';
             this.arcModeBtn.style.background = '';
             this.arcModeBtn.style.color = '';
             this.arcModeBtn.style.borderColor = '';
@@ -1182,7 +1182,7 @@ class CensorCraft {
                 const img = new Image();
                 img.onload = () => {
                     this.customTexture = img;
-                    this.textureHint.textContent = `Wybrano: ${file.name}`;
+                    this.textureHint.textContent = `Selected: ${file.name}`;
                     this.textureHint.style.color = '#28a745';
                 };
                 img.src = event.target.result;
@@ -1315,7 +1315,7 @@ class CensorCraft {
             this.image = img;
             // Clear censor areas after crop (inform user via console)
             if (this.censorAreas.length > 0) {
-                console.log('Uwaga: Obszary cenzury zostały wyczyszczone po przycięciu obrazu.');
+                console.log('Note: Censorship areas were cleared after cropping the image.');
             }
             this.censorAreas = [];
             this.saveState();
@@ -1746,14 +1746,14 @@ class CensorCraft {
         } else {
             const count = this.selectedBodyParts.size;
             if (count === 0) {
-                display.textContent = 'Brak wybranych części ciała';
+                display.textContent = 'No body parts selected';
                 display.style.color = '#e74c3c';
             } else {
                 const parts = Array.from(this.selectedBodyParts)
                     .map(id => this.bodyParts.find(p => p.id === id)?.label || id)
                     .slice(0, 3)
                     .join(', ');
-                const remaining = count > 3 ? ` (+${count - 3} więcej)` : '';
+                const remaining = count > 3 ? ` (+${count - 3} more)` : '';
                 display.textContent = `${parts}${remaining}`;
                 display.style.color = '#3498db';
             }

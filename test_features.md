@@ -1,75 +1,75 @@
-# Test Plan dla Nowych Funkcji
+# Test Plan for New Features
 
-## Funkcje do Przetestowania
+## Features to Test
 
-### ✅ Interfejs
-- [ ] Zakładki przełączają się poprawnie (Cenzura, Regulacje, Efekty, Transformacje)
-- [ ] Każda zakładka pokazuje właściwe kontrolki
-- [ ] Przyciski są responsywne i dobrze wyglądają
+### ✅ Interface
+- [ ] Tabs switch correctly (Censorship, Adjustments, Effects, Transformations)
+- [ ] Each tab shows appropriate controls
+- [ ] Buttons are responsive and look good
 
-### ✅ Regulacje Obrazu
-- [ ] Jasność: suwak działa, wartość się aktualizuje
-- [ ] Kontrast: suwak działa, wartość się aktualizuje
-- [ ] Nasycenie: suwak działa, wartość się aktualizuje
-- [ ] Ostrość: suwak działa, wartość się aktualizuje
-- [ ] Reset Regulacji: przywraca domyślne wartości
+### ✅ Image Adjustments
+- [ ] Brightness: slider works, value updates
+- [ ] Contrast: slider works, value updates
+- [ ] Saturation: slider works, value updates
+- [ ] Sharpness: slider works, value updates
+- [ ] Reset Adjustments: restores default values
 
-### ✅ Efekty
-- [ ] Filter Czarno-biały: obraz staje się monochromatyczny
-- [ ] Filter Sepia: obraz dostaje vintage look
-- [ ] Filter Inwersja: kolory są odwrócone
-- [ ] Winietowanie: brzegi obrazu ciemnieją
-- [ ] Temperatura: obraz staje się cieplejszy/chłodniejszy
+### ✅ Effects
+- [ ] Grayscale Filter: image becomes monochromatic
+- [ ] Sepia Filter: image gets vintage look
+- [ ] Inversion Filter: colors are inverted
+- [ ] Vignette: image edges darken
+- [ ] Temperature: image becomes warmer/cooler
 
-### ✅ Transformacje
-- [ ] Obrót 90°: obraz obraca się o 90° w prawo
-- [ ] Obrót 180°: obraz obraca się do góry nogami
-- [ ] Obrót 270°: obraz obraca się o 270° (lub 90° w lewo)
-- [ ] Odbicie poziome: obraz odbija się jak w lustrze
-- [ ] Odbicie pionowe: obraz odbija się góra-dół
-- [ ] Przycinanie: można zaznaczyć i przyciąć obszar
+### ✅ Transformations
+- [ ] Rotate 90°: image rotates 90° to the right
+- [ ] Rotate 180°: image rotates upside down
+- [ ] Rotate 270°: image rotates 270° (or 90° to the left)
+- [ ] Horizontal flip: image flips like a mirror
+- [ ] Vertical flip: image flips top-bottom
+- [ ] Cropping: can select and crop area
 
-### ✅ Historia
-- [ ] Przycisk Cofnij wyłączony na początku
-- [ ] Po zmianie, Cofnij się aktywuje
-- [ ] Cofnij przywraca poprzedni stan
-- [ ] Ponów przywraca cofniętą zmianę
-- [ ] Historia działa dla wszystkich typów zmian
+### ✅ History
+- [ ] Undo button disabled at start
+- [ ] After change, Undo activates
+- [ ] Undo restores previous state
+- [ ] Redo restores undone change
+- [ ] History works for all types of changes
 
-### ✅ Cenzura (istniejące funkcje)
-- [ ] Automatyczne wykrywanie nadal działa
-- [ ] Tryb rysowania nadal działa
-- [ ] Wszystkie style cenzury działają
-- [ ] Wyczyść Cenzurę nadal działa
+### ✅ Censorship (existing features)
+- [ ] Automatic detection still works
+- [ ] Drawing mode still works
+- [ ] All censorship styles work
+- [ ] Clear Censorship still works
 
-### ✅ Ogólne
-- [ ] Pobieranie obrazu zapisuje wszystkie zmiany
-- [ ] Nowy Obraz resetuje wszystko
-- [ ] Nie ma błędów w konsoli JavaScript
-- [ ] Aplikacja nie zawiesza się
+### ✅ General
+- [ ] Image download saves all changes
+- [ ] New Image resets everything
+- [ ] No errors in JavaScript console
+- [ ] Application doesn't freeze
 
-## Instrukcje Testowania
+## Testing Instructions
 
-1. Otwórz `index.html` w przeglądarce
-2. Otwórz Developer Console (F12) i sprawdź błędy
-3. Wgraj testowe zdjęcie
-4. Przejdź przez każdą zakładkę i przetestuj kontrolki
-5. Wypróbuj kombinacje różnych efektów
-6. Sprawdź czy Cofnij/Ponów działa poprawnie
-7. Pobierz finalny obraz i sprawdź czy zawiera wszystkie zmiany
+1. Open `index.html` in browser
+2. Open Developer Console (F12) and check for errors
+3. Upload test image
+4. Go through each tab and test controls
+5. Try combinations of different effects
+6. Check if Undo/Redo works correctly
+7. Download final image and check if it contains all changes
 
-## Znane Ograniczenia
+## Known Limitations
 
-- Model AI może nie działać bez połączenia z internetem (CDN)
-- Bardzo duże obrazy mogą być wolniejsze
-- Historia ograniczona do 20 kroków (oszczędność pamięci)
+- AI model may not work without internet connection (CDN)
+- Very large images may be slower
+- History limited to 20 steps (memory conservation)
 
-## Wyniki Testów
+## Test Results
 
-Data: ___________
+Date: ___________
 Tester: ___________
 
-### Podsumowanie
-- Wszystkie funkcje działają: [ ] TAK [ ] NIE
-- Znalezione błędy: ___________
-- Sugestie ulepszeń: ___________
+### Summary
+- All features work: [ ] YES [ ] NO
+- Found bugs: ___________
+- Improvement suggestions: ___________

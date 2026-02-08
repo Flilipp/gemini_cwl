@@ -1,117 +1,117 @@
-# Project: CensorCraft (lub inna nazwa, którą wybierzesz)
+# Project: CensorCraft
 
 # https://censouircraft.web.app/
 
-**Darmowe, open-source'owe i w 100% prywatne narzędzie do automatycznej cenzury, które działa w Twojej przeglądarce.**
+**Free, open-source, and 100% private automatic censorship tool that works in your browser.**
 
-[![Status Projektu: MVP Ukończone](https://img.shields.io/badge/status-MVP%20ukończone-green.svg)](https://github.com/Flilipp/gemini_cwl)
-[![Licencja: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![Project Status: MVP Complete](https://img.shields.io/badge/status-MVP%20complete-green.svg)](https://github.com/Flilipp/gemini_cwl)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
 ---
 
-## O co chodzi?
+## What is this?
 
-Project CensorCraft to odpowiedź na potrzebę społeczności - proste, darmowe i skuteczne narzędzie do cenzurowania zdjęć i wideo bez konieczności instalowania skomplikowanego oprogramowania czy wysyłania prywatnych plików na zewnętrzne serwery.
+Project CensorCraft is a response to community needs - a simple, free, and effective tool for censoring photos and videos without having to install complicated software or send private files to external servers.
 
-Wszystko, co robisz, dzieje się **lokalnie na Twoim urządzeniu**. Twoje pliki nigdy nie opuszczają Twojego komputera.
+Everything you do happens **locally on your device**. Your files never leave your computer.
 
-## 🎉 Gotowe do Użycia!
+## 🎉 Ready to Use!
 
-**MVP jest już dostępne!** Możesz używać CensorCraft już teraz:
+**MVP is now available!** You can use CensorCraft right now:
 
-1. Otwórz `index.html` w przeglądarce
-2. Przeciągnij zdjęcie lub kliknij "Wybierz Zdjęcie"
-3. AI automatycznie wykryje osoby i je ocenzuruje
-4. Pobierz ocenzurowany obraz!
+1. Open `index.html` in your browser
+2. Drag an image or click "Choose Image"
+3. AI will automatically detect people and censor them
+4. Download the censored image!
 
-📚 **Dokumentacja:**
-- [INSTRUKCJA.md](INSTRUKCJA.md) - jak używać aplikacji
-- [DEVELOPER.md](DEVELOPER.md) - dokumentacja techniczna
-- [FEATURES.md](FEATURES.md) - pełna lista funkcji
+📚 **Documentation:**
+- [README.md](README.md) - project overview and quick start
+- [DEVELOPER.md](DEVELOPER.md) - technical documentation (if exists)
+- [FEATURES.md](FEATURES.md) - complete feature list
 
-## ✨ Kluczowe Funkcje (Zaimplementowane!)
+## ✨ Key Features (Implemented!)
 
-*   ✅ **Automatyczne Wykrywanie:** Sztuczna inteligencja automatycznie rozpoznaje treści NSFW i części ciała do ocenzurowania.
-*   ✅ **Inteligentne Ładowanie Modeli:** Modele AI ładują się tylko kiedy są potrzebne (lazy loading) z automatyczną obsługą błędów i powtórzeń.
-*   ✅ **Optymalizacja Mobilna:** Automatyczne dostosowanie wydajności do urządzeń mobilnych dla płynnej pracy.
-*   ✅ **Rozbudowane Style Cenzury:** 11 różnych stylów - paski, pikselizacja, rozmycie, emoji, gradienty, wzory i więcej!
-*   ✅ **Dostosowywalna Cenzura:** Własny kolor, tekstura i regulowana przezroczystość dla każdego stylu.
-*   ✅ **Pełna Kontrola Ręczna:** Tryb rysowania - zaznaczaj własne obszary do ocenzurowania (prostokąty i łuki).
-*   ✅ **Zaawansowana Edycja:** Regulacje obrazu, filtry, transformacje, cofnij/ponów.
-*   ✅ **Przetwarzanie po Stronie Klienta:** 100% prywatności. Aplikacja działa w przeglądarce, a Twoje pliki nie są nigdzie wysyłane.
-*   ✅ **Darmowe i Open-Source:** Na zawsze, dla wszystkich. Bez reklam, bez subskrypcji.
+*   ✅ **Automatic Detection:** Artificial intelligence automatically recognizes NSFW content and body parts to censor.
+*   ✅ **Smart Model Loading:** AI models load only when needed (lazy loading) with automatic error handling and retries.
+*   ✅ **Mobile Optimization:** Automatic performance adjustment for mobile devices for smooth operation.
+*   ✅ **Extensive Censorship Styles:** 11 different styles - bars, pixelation, blur, emoji, gradients, patterns, and more!
+*   ✅ **Customizable Censorship:** Custom color, texture, and adjustable transparency for each style.
+*   ✅ **Full Manual Control:** Drawing mode - mark your own areas to censor (rectangles and arcs).
+*   ✅ **Advanced Editing:** Image adjustments, filters, transformations, undo/redo.
+*   ✅ **Client-Side Processing:** 100% privacy. The app works in your browser, and your files are never sent anywhere.
+*   ✅ **Free and Open-Source:** Forever, for everyone. No ads, no subscriptions.
 
-## 🚀 Jak to Działa? (Technologia)
+## 🚀 How Does It Work? (Technology)
 
-Magia dzieje się dzięki bibliotece **TensorFlow.js**. Pozwala ona na uruchamianie modeli sztucznej inteligencji bezpośrednio w przeglądarce. Oznacza to, że cała "ciężka praca" związana z analizą obrazu jest wykonywana przez Twój komputer lub telefon, a nie przez nasz serwer (bo go nie potrzebujemy!).
+The magic happens thanks to the **TensorFlow.js** library. It allows running artificial intelligence models directly in the browser. This means all the "heavy lifting" related to image analysis is done by your computer or phone, not by our server (because we don't need one!).
 
-**Nowe ulepszenia:**
-- **Lazy Loading:** Modele AI ładują się tylko gdy są potrzebne, oszczędzając przepustowość
-- **Retry Logic:** Automatyczne ponawianie przy błędach połączenia
-- **Mobile Optimization:** Lżejsze modele (MobileNetV1 0.5x) i mniejsze rozmiary canvas na urządzeniach mobilnych
-- **Smart Detection:** Inteligentne zarządzanie pamięcią i wydajnością
+**New improvements:**
+- **Lazy Loading:** AI models load only when needed, saving bandwidth
+- **Retry Logic:** Automatic retry on connection errors
+- **Mobile Optimization:** Lighter models (MobileNetV1 0.5x) and smaller canvas sizes on mobile devices
+- **Smart Detection:** Intelligent memory and performance management
 
-## 💖 Chcesz Pomóc? Jesteś w dobrym miejscu!
+## 💖 Want to Help? You're in the Right Place!
 
-Ten projekt jest tworzony przez społeczność, dla społeczności. Każda pomoc jest na wagę złota, nawet jeśli nie jesteś programistą!
+This project is created by the community, for the community. Every contribution is worth its weight in gold, even if you're not a programmer!
 
-**Jak możesz wnieść swój wkład:**
+**How you can contribute:**
 
-1.  ⭐ **Daj gwiazdkę temu repozytorium!** - To zwiększa jego widoczność.
-2.  💡 **Podziel się pomysłem** - Otwórz nową dyskusję w zakładce [Issues](https://github.com/twoj-nick/twoje-repo/issues) i opisz funkcję, której Ci brakuje.
-3.  🐛 **Zgłoś błąd** - Jeśli coś nie działa, daj nam znać w [Issues](https://github.com/twoj-nick/twoje-repo/issues).
-4.  💻 **Napisz kod** - Jeśli znasz się na HTML, CSS lub JavaScript, to jest idealne miejsce, by zacząć:
-    *   Zrób `fork` tego repozytorium.
-    *   Wprowadź swoje zmiany.
-    *   Stwórz `Pull Request` z opisem tego, co zrobiłeś.
+1.  ⭐ **Star this repository!** - This increases its visibility.
+2.  💡 **Share an idea** - Open a new discussion in the [Issues](https://github.com/twoj-nick/twoje-repo/issues) tab and describe a feature you're missing.
+3.  🐛 **Report a bug** - If something doesn't work, let us know in [Issues](https://github.com/twoj-nick/twoje-repo/issues).
+4.  💻 **Write code** - If you know HTML, CSS, or JavaScript, this is the perfect place to start:
+    *   Fork this repository.
+    *   Make your changes.
+    *   Create a Pull Request with a description of what you did.
 
-**Dołącz do nas na Discordzie:** [Wstaw tutaj link do swojego serwera Discord, gdy go założysz]
+**Join us on Discord:** [Insert link to your Discord server here when you create one]
 
-## 📋 Szybki Start
+## 📋 Quick Start
 
-### Użytkownicy
+### Users
 
-1. Pobierz repozytorium lub sklonuj: `git clone https://github.com/Flilipp/gemini_cwl.git`
-2. Otwórz plik `index.html` w przeglądarce
-3. Gotowe! Zobacz [INSTRUKCJA.md](INSTRUKCJA.md) po więcej szczegółów
+1. Download the repository or clone: `git clone https://github.com/Flilipp/gemini_cwl.git`
+2. Open the `index.html` file in your browser
+3. Done! See [INSTRUCTIONS.md](INSTRUCTIONS.md) for more details
 
-### Deweloperzy
+### Developers
 
 ```bash
-# Sklonuj repozytorium
+# Clone the repository
 git clone https://github.com/Flilipp/gemini_cwl.git
 cd gemini_cwl
 
-# Uruchom lokalny serwer (opcjonalne)
+# Run local server (optional)
 python -m http.server 8080
 
-# Otwórz w przeglądarce
+# Open in browser
 # http://localhost:8080
 ```
 
-Zobacz [DEVELOPER.md](DEVELOPER.md) po dokumentację techniczną.
+See [DEVELOPER.md](DEVELOPER.md) for technical documentation.
 
-## 🗺️ Mapa Drogowa (Roadmap)
+## 🗺️ Roadmap
 
-*   **[✅] Faza 1: MVP (Minimum Viable Product)** - UKOŃCZONE!
-    *   ✅ Stworzenie podstawowego interfejsu do wgrywania zdjęć (+ drag & drop).
-    *   ✅ Implementacja modelu AI do wykrywania (COCO-SSD + TensorFlow.js).
-    *   ✅ Dodanie trzech opcji cenzury (czarny pasek, pikselizacja, blur).
-    *   ✅ Opcja pobrania ocenzurowanego obrazu.
-    *   ✅ Tryb ręcznego rysowania obszarów cenzury.
-*   **[✅] Faza 2: Rozbudowa Funkcji** - UKOŃCZONE!
-    *   ✅ Dodanie większej liczby stylów cenzury (emoji, biały pasek).
-    *   ✅ Wprowadzenie zaawansowanych narzędzi do manualnej edycji w stylu Adobe:
-        *   ✅ Regulacja jasności, kontrastu, nasycenia
-        *   ✅ Filtry kolorów (czarno-biały, sepia, inwersja)
-        *   ✅ Transformacje (obrót, odbicie lustrzane, przycinanie)
-        *   ✅ Efekty artystyczne (winietowanie, temperatura, ostrość)
-        *   ✅ System cofnij/ponów (undo/redo)
-        *   ✅ Interfejs z zakładkami dla lepszej organizacji
-*   **[ ] Faza 3: Dalszy Rozwój**
-    *   Wsparcie dla plików wideo i GIF.
-    *   Optymalizacja wydajności.
+*   **[✅] Phase 1: MVP (Minimum Viable Product)** - COMPLETE!
+    *   ✅ Create basic interface for uploading images (+ drag & drop).
+    *   ✅ Implement AI model for detection (COCO-SSD + TensorFlow.js).
+    *   ✅ Add three censorship options (black bar, pixelation, blur).
+    *   ✅ Option to download censored image.
+    *   ✅ Manual drawing mode for censorship areas.
+*   **[✅] Phase 2: Feature Expansion** - COMPLETE!
+    *   ✅ Add more censorship styles (emoji, white bar).
+    *   ✅ Introduce advanced manual editing tools Adobe-style:
+        *   ✅ Brightness, contrast, saturation adjustment
+        *   ✅ Color filters (grayscale, sepia, inversion)
+        *   ✅ Transformations (rotation, flip, cropping)
+        *   ✅ Artistic effects (vignette, temperature, sharpness)
+        *   ✅ Undo/redo system
+        *   ✅ Tabbed interface for better organization
+*   **[ ] Phase 3: Further Development**
+    *   Support for video and GIF files.
+    *   Performance optimization.
 
-## 📜 Licencja
+## 📜 License
 
-Ten projekt jest udostępniany na licencji MIT. Oznacza to, że możesz z nim robić, co chcesz, o ile zachowasz oryginalną informację o licencji.
+This project is released under the MIT license. This means you can do whatever you want with it, as long as you keep the original license information.
