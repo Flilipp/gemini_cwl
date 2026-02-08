@@ -84,6 +84,17 @@
                             </div>
 
                             <div class="control-group">
+                                <label>Kategorie do Cenzury:</label>
+                                <div style="margin: 10px 0; padding: 10px; background: #f8f9fa; border-radius: 5px;">
+                                    <div id="selectedCategoriesDisplay" style="font-weight: bold; margin-bottom: 8px;">person</div>
+                                    <button class="btn-secondary" id="configureCategoriesBtn" style="width: 100%;">
+                                        ⚙️ Wybierz Kategorie
+                                    </button>
+                                </div>
+                                <small class="hint">Wybierz które obiekty mają być cenzurowane</small>
+                            </div>
+
+                            <div class="control-group">
                                 <button class="btn-secondary" id="detectBtn">
                                     🤖 Wykryj Automatycznie
                                 </button>
@@ -99,6 +110,28 @@
                                 <button class="btn-secondary" id="clearBtn">
                                     🗑️ Wyczyść Cenzurę
                                 </button>
+                            </div>
+                        </div>
+
+                        <!-- Category Selection Modal -->
+                        <div id="categoryModal" class="modal" style="display: none;">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <h3>Wybierz Kategorie do Cenzury</h3>
+                                    <button class="modal-close" id="closeCategoryModal">&times;</button>
+                                </div>
+                                <div class="modal-body">
+                                    <div style="margin-bottom: 15px;">
+                                        <button class="btn-secondary" id="selectAllCategories" style="margin-right: 10px;">Zaznacz wszystkie</button>
+                                        <button class="btn-secondary" id="deselectAllCategories">Odznacz wszystkie</button>
+                                    </div>
+                                    <div class="category-grid" id="categoryGrid">
+                                        <!-- Categories will be populated by JavaScript -->
+                                    </div>
+                                </div>
+                                <div class="modal-footer">
+                                    <button class="btn-primary" id="saveCategoriesBtn">Zapisz</button>
+                                </div>
                             </div>
                         </div>
 

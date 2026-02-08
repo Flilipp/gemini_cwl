@@ -34,6 +34,23 @@ class CensorCraft {
         this.historyIndex = -1;
         this.maxHistory = 20;
         
+        // COCO-SSD object categories
+        this.cocoCategories = [
+            'person', 'bicycle', 'car', 'motorcycle', 'airplane', 'bus', 'train', 'truck', 'boat',
+            'traffic light', 'fire hydrant', 'stop sign', 'parking meter', 'bench', 'bird', 'cat',
+            'dog', 'horse', 'sheep', 'cow', 'elephant', 'bear', 'zebra', 'giraffe', 'backpack',
+            'umbrella', 'handbag', 'tie', 'suitcase', 'frisbee', 'skis', 'snowboard', 'sports ball',
+            'kite', 'baseball bat', 'baseball glove', 'skateboard', 'surfboard', 'tennis racket',
+            'bottle', 'wine glass', 'cup', 'fork', 'knife', 'spoon', 'bowl', 'banana', 'apple',
+            'sandwich', 'orange', 'broccoli', 'carrot', 'hot dog', 'pizza', 'donut', 'cake',
+            'chair', 'couch', 'potted plant', 'bed', 'dining table', 'toilet', 'tv', 'laptop',
+            'mouse', 'remote', 'keyboard', 'cell phone', 'microwave', 'oven', 'toaster', 'sink',
+            'refrigerator', 'book', 'clock', 'vase', 'scissors', 'teddy bear', 'hair drier', 'toothbrush'
+        ];
+        
+        // Selected categories to censor (default: only person)
+        this.selectedCategories = new Set(['person']);
+        
         this.initializeElements();
         this.attachEventListeners();
         this.loadModel();
@@ -78,6 +95,18 @@ class CensorCraft {
         this.flipHorizontalBtn = document.getElementById('flipHorizontal');
         this.flipVerticalBtn = document.getElementById('flipVertical');
         this.resetAdjustmentsBtn = document.getElementById('resetAdjustments');
+        
+        // Category modal elements
+        this.categoryModal = document.getElementById('categoryModal');
+        this.configureCategoriesBtn = document.getElementById('configureCategoriesBtn');
+        this.closeCategoryModal = document.getElementById('closeCategoryModal');
+        this.saveCategoriesBtn = document.getElementById('saveCategoriesBtn');
+        this.selectAllCategoriesBtn = document.getElementById('selectAllCategories');
+        this.deselectAllCategoriesBtn = document.getElementById('deselectAllCategories');
+        this.categoryGrid = document.getElementById('categoryGrid');
+        
+        // Initialize category grid
+        this.initializeCategoryGrid();
     }
 
     attachEventListeners() {
@@ -198,6 +227,104 @@ class CensorCraft {
 
         // Reset button
         this.resetAdjustmentsBtn.addEventListener('click', () => this.resetAdjustments());
+        
+        // Category modal event listeners
+        this.configureCategoriesBtn.addEventListener('click', () => this.openCategoryModal());
+        this.closeCategoryModal.addEventListener('click', () => this.closeCategoryModalHandler());
+        this.saveCategoriesBtn.addEventListener('click', () => this.closeCategoryModalHandler());
+        this.selectAllCategoriesBtn.addEventListener('click', () => this.selectAllCategories());
+        this.deselectAllCategoriesBtn.addEventListener('click', () => this.deselectAllCategories());
+        
+        // Close modal when clicking outside
+        this.categoryModal.addEventListener('click', (e) => {
+            if (e.target === this.categoryModal) {
+                this.closeCategoryModalHandler();
+            }
+        });
+    }
+    
+    initializeCategoryGrid() {
+        this.categoryGrid.innerHTML = '';
+        
+        // Polish translations for common categories
+        const translations = {
+            'person': 'osoba',
+            'bicycle': 'rower',
+            'car': 'samochód',
+            'motorcycle': 'motocykl',
+            'airplane': 'samolot',
+            'bus': 'autobus',
+            'train': 'pociąg',
+            'truck': 'ciężarówka',
+            'boat': 'łódź',
+            'traffic light': 'światła',
+            'fire hydrant': 'hydrant',
+            'stop sign': 'znak stop',
+            'parking meter': 'parkometr',
+            'bench': 'ławka',
+            'bird': 'ptak',
+            'cat': 'kot',
+            'dog': 'pies',
+            'horse': 'koń',
+            'sheep': 'owca',
+            'cow': 'krowa',
+            'elephant': 'słoń',
+            'bear': 'niedźwiedź',
+            'zebra': 'zebra',
+            'giraffe': 'żyrafa',
+            'backpack': 'plecak',
+            'umbrella': 'parasol',
+            'handbag': 'torebka',
+            'tie': 'krawat',
+            'suitcase': 'walizka',
+            'cell phone': 'telefon'
+        };
+        
+        this.cocoCategories.forEach(category => {
+            const item = document.createElement('div');
+            item.className = 'category-item';
+            if (this.selectedCategories.has(category)) {
+                item.classList.add('selected');
+            }
+            
+            const checkbox = document.createElement('input');
+            checkbox.type = 'checkbox';
+            checkbox.id = `category-${category.replace(/\s+/g, '-')}`;
+            checkbox.checked = this.selectedCategories.has(category);
+            
+            const label = document.createElement('label');
+            label.htmlFor = checkbox.id;
+            const displayName = translations[category] || category;
+            label.textContent = displayName;
+            
+            checkbox.addEventListener('change', () => {
+                this.toggleCategory(category);
+                if (checkbox.checked) {
+                    item.classList.add('selected');
+                } else {
+                    item.classList.remove('selected');
+                }
+            });
+            
+            item.addEventListener('click', (e) => {
+                if (e.target !== checkbox) {
+                    checkbox.checked = !checkbox.checked;
+                    checkbox.dispatchEvent(new Event('change'));
+                }
+            });
+            
+            item.appendChild(checkbox);
+            item.appendChild(label);
+            this.categoryGrid.appendChild(item);
+        });
+    }
+    
+    openCategoryModal() {
+        this.categoryModal.style.display = 'flex';
+    }
+    
+    closeCategoryModalHandler() {
+        this.categoryModal.style.display = 'none';
     }
 
     switchTab(tabName) {
@@ -223,6 +350,9 @@ class CensorCraft {
             this.model = await cocoSsd.load();
             console.log('Model załadowany pomyślnie!');
             this.showLoading(false);
+            
+            // Update category display after loading
+            this.updateCategoryDisplay();
         } catch (error) {
             console.error('Błąd ładowania modelu:', error);
             alert('Nie udało się załadować modelu AI. Sprawdź połączenie internetowe.');
@@ -540,17 +670,18 @@ class CensorCraft {
             console.log('Wykryto obiekty:', predictions);
 
             const confidenceThreshold = this.confidenceSlider.value / 100;
-            const people = predictions.filter(p => 
-                p.class === 'person' && p.score >= confidenceThreshold
+            const detectedObjects = predictions.filter(p => 
+                this.selectedCategories.has(p.class) && p.score >= confidenceThreshold
             );
             
-            if (people.length === 0) {
-                alert('Nie wykryto żadnych osób na zdjęciu z wybranym poziomem pewności.');
+            if (detectedObjects.length === 0) {
+                const categoriesText = Array.from(this.selectedCategories).join(', ');
+                alert(`Nie wykryto żadnych obiektów (${categoriesText}) na zdjęciu z wybranym poziomem pewności.`);
             } else {
                 const areaPercentage = this.areaPercentageSlider.value / 100;
                 
-                people.forEach(person => {
-                    const [x, y, w, h] = person.bbox;
+                detectedObjects.forEach(obj => {
+                    const [x, y, w, h] = obj.bbox;
                     const censorHeight = h * areaPercentage;
                     const censorY = y;
                     
@@ -850,6 +981,55 @@ class CensorCraft {
     updateHistoryButtons() {
         this.undoBtn.disabled = this.historyIndex <= 0;
         this.redoBtn.disabled = this.historyIndex >= this.history.length - 1;
+    }
+    
+    toggleCategory(category) {
+        if (this.selectedCategories.has(category)) {
+            this.selectedCategories.delete(category);
+        } else {
+            this.selectedCategories.add(category);
+        }
+        this.updateCategoryDisplay();
+    }
+    
+    selectAllCategories() {
+        this.selectedCategories = new Set(this.cocoCategories);
+        this.updateCategoryCheckboxes();
+        this.updateCategoryDisplay();
+    }
+    
+    deselectAllCategories() {
+        this.selectedCategories.clear();
+        this.updateCategoryCheckboxes();
+        this.updateCategoryDisplay();
+    }
+    
+    updateCategoryCheckboxes() {
+        this.cocoCategories.forEach(category => {
+            const checkbox = document.getElementById(`category-${category.replace(/\s+/g, '-')}`);
+            if (checkbox) {
+                checkbox.checked = this.selectedCategories.has(category);
+            }
+        });
+    }
+    
+    updateCategoryDisplay() {
+        const display = document.getElementById('selectedCategoriesDisplay');
+        if (display) {
+            const count = this.selectedCategories.size;
+            if (count === 0) {
+                display.textContent = 'Brak wybranych kategorii';
+                display.style.color = '#e74c3c';
+            } else if (count === this.cocoCategories.length) {
+                display.textContent = 'Wszystkie kategorie wybrane';
+                display.style.color = '#27ae60';
+            } else {
+                const categories = Array.from(this.selectedCategories).slice(0, 3).join(', ');
+                const remaining = count > 3 ? ` (+${count - 3} więcej)` : '';
+                display.textContent = `${categories}${remaining}`;
+                display.style.color = '#3498db';
+            }
+        }
     }
 
     reset() {
