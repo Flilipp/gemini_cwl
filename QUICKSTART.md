@@ -35,7 +35,29 @@
 
 ## 🚀 JAK ZACZĄĆ:
 
-### 1. Testowanie Lokalne (WAŻNE - najpierw przetestuj!)
+### 1. Automatyczne Wdrożenie (Zalecane! ✨)
+
+**GitHub Actions automatycznie wdraża aplikację na Firebase!**
+
+```bash
+# 1. Skonfiguruj Firebase secret (JEDNORAZOWO):
+firebase login
+firebase init hosting:github
+# Wybierz repo: Flilipp/gemini_cwl
+# Automatycznie skonfiguruje secret!
+
+# 2. Push do main:
+git add .
+git commit -m "Your changes"
+git push origin main
+
+# 3. Gotowe! Aplikacja wdroży się automatycznie!
+# Sprawdź: https://censouircraft.web.app
+```
+
+**Zobacz**: `GITHUB_ACTIONS_SETUP.md` dla szczegółowej instrukcji!
+
+### 2. Testowanie Lokalne (przed pushem)
 
 ```bash
 # W katalogu projektu:
@@ -61,30 +83,41 @@ python3 -m http.server 8080
 3. Wgraj zdjęcie osoby
 4. Kliknij "🤖 Wykryj Automatycznie"
 
-### 3. Wdrożenie na Firebase
+### 3. Wdrożenie - JUŻ SKONFIGUROWANE! ✅
+
+**Aplikacja wdraża się AUTOMATYCZNIE przez GitHub Actions!**
+
+Projekt Firebase ID: `censouircraft`
+URL: `https://censouircraft.web.app`
+
+**Jednorazowa konfiguracja (jeśli jeszcze nie zrobiłeś):**
 
 ```bash
-# 1. Zainstaluj Firebase CLI
-npm install -g firebase-tools
-
-# 2. Zaloguj się
+# Skonfiguruj Firebase secret dla GitHub Actions:
 firebase login
+firebase init hosting:github
+# Wybierz: Flilipp/gemini_cwl
+# Potwierdź automatyczną konfigurację
 
-# 3. Utwórz projekt na https://console.firebase.google.com/
-#    Skopiuj ID projektu
+# Gotowe! Teraz każdy push automatycznie wdraża aplikację!
+```
 
-# 4. Edytuj .firebaserc - wstaw swój ID projektu:
-# {
-#   "projects": {
-#     "default": "twoj-projekt-id"
-#   }
-# }
+**Codzienne użytkowanie:**
 
-# 5. Deploy!
+```bash
+# Po prostu pushuj zmiany:
+git add .
+git commit -m "Moje zmiany"
+git push origin main
+
+# GitHub Actions automatycznie wdroży na:
+# https://censouircraft.web.app
+```
+
+**Ręczne wdrożenie (opcjonalne):**
+
+```bash
 firebase deploy --only hosting
-
-# 6. Gotowe! Aplikacja będzie pod:
-# https://twoj-projekt-id.web.app
 ```
 
 ### 4. Share on Reddit! 🎯
