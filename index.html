@@ -54,6 +54,15 @@
                             <h3>Kontrola Cenzury</h3>
                             
                             <div class="control-group">
+                                <label>Tryb Wykrywania:</label>
+                                <select id="detectionMode">
+                                    <option value="nsfw">🔞 Treści NSFW (całe zdjęcie)</option>
+                                    <option value="bodyparts">🧍 Części Ciała (Beta)</option>
+                                </select>
+                                <small class="hint">Wybierz co ma wykrywać AI</small>
+                            </div>
+
+                            <div class="control-group">
                                 <label>Styl Cenzury:</label>
                                 <select id="censorStyle">
                                     <option value="blackbar">Czarny Pasek</option>
@@ -72,15 +81,20 @@
                             </div>
 
                             <div class="control-group">
-                                <label>Obszar Cenzury: <span id="areaPercentageLabel">20%</span></label>
-                                <input type="range" id="areaPercentage" min="10" max="100" value="20" step="5">
-                                <small class="hint">Dostosuj wielkość obszaru cenzury</small>
-                            </div>
-
-                            <div class="control-group">
                                 <label>Pewność Detekcji: <span id="confidenceLabel">50%</span></label>
                                 <input type="range" id="confidenceThreshold" min="10" max="90" value="50" step="5">
                                 <small class="hint">Wyższe wartości = mniej fałszywych detekcji</small>
+                            </div>
+
+                            <div class="control-group">
+                                <label>Kategorie do Cenzury:</label>
+                                <div style="margin: 10px 0; padding: 10px; background: #f8f9fa; border-radius: 5px;">
+                                    <div id="selectedCategoriesDisplay" style="font-weight: bold; margin-bottom: 8px;">Pornografia, Hentai</div>
+                                    <button class="btn-secondary" id="configureCategoriesBtn" style="width: 100%;">
+                                        ⚙️ Wybierz Kategorie
+                                    </button>
+                                </div>
+                                <small class="hint" id="categoriesHint">Wybierz które treści NSFW mają być cenzurowane</small>
                             </div>
 
                             <div class="control-group">
@@ -99,6 +113,28 @@
                                 <button class="btn-secondary" id="clearBtn">
                                     🗑️ Wyczyść Cenzurę
                                 </button>
+                            </div>
+                        </div>
+
+                        <!-- Category Selection Modal -->
+                        <div id="categoryModal" class="modal" style="display: none;">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <h3 id="modalTitle">Wybierz Kategorie NSFW do Cenzury</h3>
+                                    <button class="modal-close" id="closeCategoryModal">&times;</button>
+                                </div>
+                                <div class="modal-body">
+                                    <div style="margin-bottom: 15px;" id="modalButtons">
+                                        <button class="btn-secondary" id="selectAllCategories" style="margin-right: 10px;">Zaznacz wszystkie</button>
+                                        <button class="btn-secondary" id="deselectAllCategories">Odznacz wszystkie</button>
+                                    </div>
+                                    <div class="category-grid" id="categoryGrid">
+                                        <!-- Categories will be populated by JavaScript -->
+                                    </div>
+                                </div>
+                                <div class="modal-footer">
+                                    <button class="btn-primary" id="saveCategoriesBtn">Zapisz</button>
+                                </div>
                             </div>
                         </div>
 
@@ -225,8 +261,10 @@
         </footer>
     </div>
 
-    <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@4.11.0"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@tensorflow-models/coco-ssd@2.2.3"></script>
+    <!-- AI Models - loaded from CDN with integrity checks -->
+    <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@4.11.0" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@tensorflow-models/body-pix@2.2.0" crossorigin="anonymous"></script>
+    <script src="https://unpkg.com/nsfwjs@2.4.2/dist/nsfwjs.min.js" crossorigin="anonymous"></script>
     <script src="app.js"></script>
 </body>
 </html>
