@@ -70,7 +70,17 @@
                                     <option value="blur">Rozmycie</option>
                                     <option value="emoji">Emoji 😎</option>
                                     <option value="whitebar">Biały Pasek</option>
+                                    <option value="texture">Własna Tekstura 🎨</option>
                                 </select>
+                            </div>
+
+                            <div class="control-group" id="textureUploadSection" style="display: none;">
+                                <label>Wgraj Teksturę Cenzury:</label>
+                                <input type="file" id="textureInput" accept="image/*" hidden>
+                                <button class="btn-secondary" id="uploadTextureBtn" style="width: 100%;">
+                                    📁 Wybierz Teksturę
+                                </button>
+                                <small class="hint" id="textureHint">Nie wybrano tekstury</small>
                             </div>
 
                             <div class="control-group">
@@ -106,6 +116,12 @@
                             <div class="control-group">
                                 <button class="btn-secondary" id="drawModeBtn">
                                     ✏️ Rysuj Obszar Cenzury
+                                </button>
+                            </div>
+
+                            <div class="control-group">
+                                <button class="btn-secondary" id="arcModeBtn">
+                                    🌙 Rysuj Łuki i Krzywe
                                 </button>
                             </div>
 

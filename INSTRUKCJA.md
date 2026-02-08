@@ -57,11 +57,20 @@ Po wgraniu zdjęcia:
 
 ### Krok 3: Wybór Stylu Cenzury
 
-Dostępne są 3 style cenzury:
+Dostępne są różne style cenzury:
 
 - **Czarny Pasek** - klasyczne czarne prostokąty
 - **Pikselizacja** - efekt rozmytych pikseli
 - **Rozmycie** - efekt gaussowskiego rozmycia
+- **Emoji 😎** - zabawne emotikony jako cenzura
+- **Biały Pasek** - białe prostokąty
+- **Własna Tekstura 🎨** - użyj własnego wzoru do cenzury
+
+#### Jak używać Własnej Tekstury:
+1. Wybierz "Własna Tekstura 🎨" z listy stylów
+2. Pojawi się przycisk "📁 Wybierz Teksturę"
+3. Kliknij przycisk i wybierz obraz, który chcesz użyć jako wzór cenzury
+4. Tekstura zostanie powtórzona (tiled) na wszystkich obszarach cenzury
 
 Zmień styl w menu rozwijanym i kliknij ponownie "Wykryj Automatycznie" aby zastosować nowy styl.
 
@@ -69,12 +78,21 @@ Zmień styl w menu rozwijanym i kliknij ponownie "Wykryj Automatycznie" aby zast
 
 Jeśli automatyczne wykrywanie nie działa lub chcesz dodać dodatkowe obszary:
 
+#### Rysowanie Prostokątów:
 1. Kliknij **"✏️ Rysuj Obszar Cenzury"**
 2. Kursor zmieni się w krzyżyk
 3. Kliknij i przeciągnij na obrazie, aby narysować prostokąt cenzury
 4. Puszczając przycisk myszy, obszar zostanie ocenzurowany
 5. Możesz dodać wiele obszarów
 6. Kliknij ponownie przycisk, aby wyłączyć tryb rysowania
+
+#### Rysowanie Łuków i Krzywych:
+1. Kliknij **"🌙 Rysuj Łuki i Krzywe"**
+2. Klikaj na obrazie aby dodawać punkty
+3. Punkty będą automatycznie połączone płynnymi krzywymi
+4. Po dodaniu kilku punktów, kliknij ponownie przycisk aby zakończyć
+5. Obszar obejmujący wszystkie punkty zostanie ocenzurowany
+6. Świetne do cenzurowania nieregularnych kształtów!
 
 ### Krok 5: Pobierz Ocenzurowany Obraz
 
