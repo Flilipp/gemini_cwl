@@ -87,14 +87,33 @@ class CensorCraft {
         this.censorColor = '#000000';
         this.censorOpacity = 1.0;
         
+        // Pattern configuration
+        this.patternConfig = {
+            stripeWidth: 10,
+            dotSize: 8,
+            dotSpacing: 15,
+            gridSize: 20
+        };
+        
+        // Gradient colors (can be customized later)
+        this.gradientColors = [
+            'rgba(0, 0, 0, {opacity})',
+            'rgba(128, 0, 128, {opacity})',
+            'rgba(255, 0, 255, {opacity})'
+        ];
+        
         this.initializeElements();
         this.attachEventListeners();
         // Don't load models immediately - use lazy loading instead
     }
     
     detectMobile() {
-        return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) ||
-               window.innerWidth <= 768;
+        return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+    }
+    
+    isMobileDevice() {
+        // Dynamic check that considers current window size
+        return this.detectMobile() || window.innerWidth <= 768;
     }
 
     initializeElements() {
@@ -504,7 +523,7 @@ class CensorCraft {
             console.log('Ładowanie modelu BodyPix...');
             
             // Mobile-optimized settings
-            const config = this.isMobile ? {
+            const config = this.isMobileDevice() ? {
                 architecture: 'MobileNetV1',
                 outputStride: 16,
                 multiplier: 0.5,      // Lighter for mobile
@@ -578,12 +597,16 @@ class CensorCraft {
     
     async retryLoad(loadFn, maxRetries = 3, delayMs = 1000) {
         for (let i = 0; i < maxRetries; i++) {
+            let timeoutId;
             try {
-                const timeoutPromise = new Promise((_, reject) => 
-                    setTimeout(() => reject(new Error('Timeout')), 30000)
-                );
-                return await Promise.race([loadFn(), timeoutPromise]);
+                const timeoutPromise = new Promise((_, reject) => {
+                    timeoutId = setTimeout(() => reject(new Error('Timeout')), 30000);
+                });
+                const result = await Promise.race([loadFn(), timeoutPromise]);
+                clearTimeout(timeoutId);
+                return result;
             } catch (error) {
+                if (timeoutId) clearTimeout(timeoutId);
                 console.warn(`Próba ${i + 1}/${maxRetries} nie powiodła się:`, error.message);
                 if (i === maxRetries - 1) throw error;
                 await new Promise(resolve => setTimeout(resolve, delayMs * (i + 1)));
@@ -612,11 +635,11 @@ class CensorCraft {
                 
                 // Disable auto-detection on mobile if image is large
                 const shouldAutoDetect = this.autoDetectCheckbox.checked && 
-                    (!this.isMobile || (img.width * img.height < 1000000));
+                    (!this.isMobileDevice() || (img.width * img.height < 1000000));
                 
                 if (shouldAutoDetect) {
                     setTimeout(() => this.detectAndCensor(), 500);
-                } else if (this.isMobile && this.autoDetectCheckbox.checked) {
+                } else if (this.isMobileDevice() && this.autoDetectCheckbox.checked) {
                     console.log('Auto-detection wyłączone dla dużych obrazów na urządzeniach mobilnych');
                 }
             };
@@ -628,8 +651,8 @@ class CensorCraft {
     displayImage() {
         // Resize canvas to fit image while maintaining aspect ratio
         // More aggressive limits for mobile
-        const maxWidth = this.isMobile ? 600 : 800;
-        const maxHeight = this.isMobile ? 450 : 600;
+        const maxWidth = this.isMobileDevice() ? 600 : 800;
+        const maxHeight = this.isMobileDevice() ? 450 : 600;
         let width = this.image.width;
         let height = this.image.height;
 
@@ -1266,9 +1289,13 @@ class CensorCraft {
             area.x, area.y, 
             area.x + area.width, area.y + area.height
         );
-        gradient.addColorStop(0, 'rgba(0, 0, 0, ' + this.censorOpacity + ')');
-        gradient.addColorStop(0.5, 'rgba(128, 0, 128, ' + this.censorOpacity + ')');
-        gradient.addColorStop(1, 'rgba(255, 0, 255, ' + this.censorOpacity + ')');
+        
+        // Apply gradient colors with opacity
+        this.gradientColors.forEach((color, index) => {
+            const stop = index / (this.gradientColors.length - 1);
+            const colorWithOpacity = color.replace('{opacity}', this.censorOpacity);
+            gradient.addColorStop(stop, colorWithOpacity);
+        });
         
         this.ctx.fillStyle = gradient;
         this.ctx.fillRect(area.x, area.y, area.width, area.height);
@@ -1276,7 +1303,7 @@ class CensorCraft {
     
     stripesArea(area) {
         this.ctx.globalAlpha = this.censorOpacity;
-        const stripeWidth = 10;
+        const stripeWidth = this.patternConfig.stripeWidth;
         
         for (let x = area.x; x < area.x + area.width; x += stripeWidth * 2) {
             this.ctx.fillStyle = '#000000';
@@ -1291,8 +1318,8 @@ class CensorCraft {
     dotsArea(area) {
         this.ctx.globalAlpha = this.censorOpacity;
         this.ctx.fillStyle = '#000000';
-        const dotSize = 8;
-        const spacing = 15;
+        const dotSize = this.patternConfig.dotSize;
+        const spacing = this.patternConfig.dotSpacing;
         
         for (let y = area.y; y < area.y + area.height; y += spacing) {
             for (let x = area.x; x < area.x + area.width; x += spacing) {
@@ -1309,7 +1336,7 @@ class CensorCraft {
         this.ctx.globalAlpha = this.censorOpacity;
         this.ctx.strokeStyle = '#000000';
         this.ctx.lineWidth = 2;
-        const gridSize = 20;
+        const gridSize = this.patternConfig.gridSize;
         
         // Vertical lines
         for (let x = area.x; x <= area.x + area.width; x += gridSize) {
