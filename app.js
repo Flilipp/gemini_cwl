@@ -589,11 +589,11 @@ class CensorCraft {
         this.nsfwLoading = true;
         try {
             console.log('Ładowanie modelu NSFW...');
-            // Use the default bundled model from nsfwjs package
-            // Calling load() without parameters uses the bundled MobileNetV2 model
-            // This avoids CDN issues when trying to fetch model files from external sources
+            // Load model from local path to avoid CDN issues
+            // The CloudFront CDN has been having reliability issues
+            // Models are hosted locally in the models/mobilenet_v2/ directory
             this.nsfwModel = await this.retryLoad(
-                () => nsfwjs.load(), 
+                () => nsfwjs.load('./models/mobilenet_v2/'), 
                 3,
                 1000,
                 'NSFW'
