@@ -589,8 +589,10 @@ class CensorCraft {
         this.nsfwLoading = true;
         try {
             console.log('Ładowanie modelu NSFW...');
+            // Use bundled MobileNetV2 model which is included in the nsfwjs package
+            // This avoids CDN issues with the default load() call
             this.nsfwModel = await this.retryLoad(
-                () => nsfwjs.load(), 
+                () => nsfwjs.load('MobileNetV2'), 
                 3,
                 1000,
                 'NSFW'
@@ -1009,7 +1011,18 @@ class CensorCraft {
             }
         } catch (error) {
             console.error('Błąd wykrywania NSFW:', error);
-            alert('Wystąpił błąd podczas wykrywania treści NSFW.');
+            let errorMessage = 'Wystąpił błąd podczas wykrywania treści NSFW.';
+            
+            // Check for network-related errors
+            if (error instanceof TypeError || 
+                (error.message && (error.message.toLowerCase().includes('fetch') || 
+                                   error.message.toLowerCase().includes('network') ||
+                                   error.message.toLowerCase().includes('load')))) {
+                errorMessage += '\n\nProblem z połączeniem sieciowym. Sprawdź połączenie internetowe i spróbuj ponownie.';
+            } else if (error.message) {
+                errorMessage += `\n\nSzczegóły: ${error.message}`;
+            }
+            alert(errorMessage);
         } finally {
             this.showLoading(false);
         }
