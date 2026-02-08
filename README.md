@@ -25,8 +25,8 @@ Everything you do happens **locally on your device**. Your files never leave you
 4. Download the censored image!
 
 📚 **Documentation:**
-- [INSTRUCTIONS.md](INSTRUCTIONS.md) - how to use the app
-- [DEVELOPER.md](DEVELOPER.md) - technical documentation
+- [README.md](README.md) - project overview and quick start
+- [DEVELOPER.md](DEVELOPER.md) - technical documentation (if exists)
 - [FEATURES.md](FEATURES.md) - complete feature list
 
 ## ✨ Key Features (Implemented!)

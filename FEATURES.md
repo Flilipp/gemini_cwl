@@ -168,9 +168,9 @@
 - `index.html` - main interface
 - `app.js` - application logic
 - `styles.css` - styling
-- `INSTRUCTIONS.md` - user documentation
-- `DEVELOPER.md` - developer documentation
 - `README.md` - project description
+- `FEATURES.md` - feature list
+- `test_features.md` - test plan
 - `.gitignore` - git configuration
 
 ### External Libraries

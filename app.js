@@ -566,10 +566,10 @@ class CensorCraft {
                 1000,
                 'BodyPix'
             );
-            console.log('Model BodyPix załadowany!');
+            console.log('BodyPix model loaded!');
             return this.bodyPixModel;
         } catch (error) {
-            console.error('Błąd ładowania modelu BodyPix:', error);
+            console.error('Error loading BodyPix model:', error);
             throw error;
         } finally {
             this.bodyPixLoading = false;
@@ -597,10 +597,10 @@ class CensorCraft {
                 1000,
                 'NSFW'
             );
-            console.log('Model NSFW załadowany!');
+            console.log('NSFW model loaded!');
             return this.nsfwModel;
         } catch (error) {
-            console.error('Błąd ładowania modelu NSFW:', error);
+            console.error('Error loading NSFW model:', error);
             throw error;
         } finally {
             this.nsfwLoading = false;
@@ -624,7 +624,7 @@ class CensorCraft {
             this.showLoading(false);
             this.updateCategoryDisplay();
         } catch (error) {
-            console.error('Błąd ładowania modeli:', error);
+            console.error('Error loading models:', error);
             this.showLoading(false);
             throw error;
         } finally {
@@ -644,7 +644,7 @@ class CensorCraft {
                 return result;
             } catch (error) {
                 if (timeoutId) clearTimeout(timeoutId);
-                console.warn(`Próba ${i + 1}/${maxRetries} nie powiodła się:`, error.message);
+                console.warn(`Attempt ${i + 1}/${maxRetries} failed:`, error.message);
                 if (i === maxRetries - 1) throw error;
                 await new Promise(resolve => setTimeout(resolve, delayMs * (i + 1)));
             }
@@ -677,7 +677,7 @@ class CensorCraft {
                 if (shouldAutoDetect) {
                     setTimeout(() => this.detectAndCensor(), 500);
                 } else if (this.isMobileDevice() && this.autoDetectCheckbox.checked) {
-                    console.log('Auto-detection wyłączone dla dużych obrazów na urządzeniach mobilnych');
+                    console.log('Auto-detection disabled for large images on mobile devices');
                 }
             };
             img.src = e.target.result;
@@ -970,11 +970,11 @@ class CensorCraft {
             // Ensure NSFW model is loaded
             await this.ensureNSFWLoaded();
             
-            this.showLoading(true, 'Wykrywanie treści NSFW...');
+            this.showLoading(true, 'Detecting NSFW content...');
             
             // NSFWJS classifies the entire image
             const predictions = await this.nsfwModel.classify(this.canvas);
-            console.log('Predykcje NSFW:', predictions);
+            console.log('NSFW predictions:', predictions);
             
             // Find predictions matching selected categories
             const nsfwDetected = predictions.filter(p => 
@@ -985,7 +985,7 @@ class CensorCraft {
                 const categoriesText = Array.from(this.selectedNSFWCategories)
                     .map(cat => this.nsfwCategories.find(c => c.id === cat)?.label || cat)
                     .join(', ');
-                alert(`Nie wykryto treści NSFW (${categoriesText}) na tym zdjęciu.`);
+                alert(`No NSFW content (${categoriesText}) detected in this image.`);
             } else {
                 // NSFW model classifies whole image, so censor the entire image
                 const highestNSFW = nsfwDetected[0];
@@ -1004,9 +1004,9 @@ class CensorCraft {
                     this.applyCensorship();
                     
                     const categoryLabel = this.nsfwCategories.find(c => c.id === highestNSFW.className)?.label || highestNSFW.className;
-                    alert(`Wykryto treści: ${categoryLabel} (${Math.round(highestNSFW.probability * 100)}% pewności)`);
+                    alert(`Content detected: ${categoryLabel} (${Math.round(highestNSFW.probability * 100)}% confidence)`);
                 } else {
-                    alert(`Wykryto treści NSFW, ale poniżej progu pewności (${Math.round(highestNSFW.probability * 100)}% < ${Math.round(confidenceThreshold * 100)}%)`);
+                    alert(`NSFW content detected but below confidence threshold (${Math.round(highestNSFW.probability * 100)}% < ${Math.round(confidenceThreshold * 100)}%)`);
                 }
             }
         } catch (error) {
@@ -1018,9 +1018,9 @@ class CensorCraft {
                 (error.message && (error.message.toLowerCase().includes('fetch') || 
                                    error.message.toLowerCase().includes('network') ||
                                    error.message.toLowerCase().includes('load')))) {
-                errorMessage += '\n\nProblem z połączeniem sieciowym. Sprawdź połączenie internetowe i spróbuj ponownie.';
+                errorMessage += '\n\nNetwork connection problem. Check your internet connection and try again.';
             } else if (error.message) {
-                errorMessage += `\n\nSzczegóły: ${error.message}`;
+                errorMessage += `\n\nDetails: ${error.message}`;
             }
             alert(errorMessage);
         } finally {
@@ -1030,24 +1030,24 @@ class CensorCraft {
     
     async detectBodyParts() {
         if (this.selectedBodyParts.size === 0) {
-            alert('Wybierz przynajmniej jedną część ciała do cenzury.');
+            alert('Select at least one body part to censor.');
             return;
         }
 
-        this.showLoading(true, 'Ładowanie modelu BodyPix...');
+        this.showLoading(true, 'Loading BodyPix model...');
         
         try {
             // Ensure BodyPix model is loaded
             await this.ensureBodyPixLoaded();
             
-            this.showLoading(true, 'Wykrywanie części ciała...');
+            this.showLoading(true, 'Detecting body parts...');
             
             // Perform body part segmentation
             const segmentation = await this.bodyPixModel.segmentPersonParts(this.canvas);
-            console.log('Segmentacja części ciała:', segmentation);
+            console.log('Body part segmentation:', segmentation);
             
             if (!segmentation || segmentation.allPoses.length === 0) {
-                alert('Nie wykryto osoby na zdjęciu.');
+                alert('No person detected in the image.');
                 this.showLoading(false);
                 return;
             }
@@ -1102,7 +1102,7 @@ class CensorCraft {
             });
             
             if (this.censorAreas.length === 0) {
-                alert('Nie wykryto wybranych części ciała na zdjęciu.');
+                alert('Selected body parts not detected in the image.');
             } else {
                 this.saveState();
                 this.applyCensorship();
@@ -1151,7 +1151,7 @@ class CensorCraft {
         
         if (this.arcMode) {
             wrapper.classList.add('draw-mode');
-            this.arcModeBtn.textContent = '🛑 Zakończ Rysowanie Łuków';
+            this.arcModeBtn.textContent = '🛑 Finish Drawing Arcs';
             this.arcModeBtn.style.background = '#dc3545';
             this.arcModeBtn.style.color = 'white';
             this.arcModeBtn.style.borderColor = '#dc3545';
@@ -1746,14 +1746,14 @@ class CensorCraft {
         } else {
             const count = this.selectedBodyParts.size;
             if (count === 0) {
-                display.textContent = 'Brak wybranych części ciała';
+                display.textContent = 'No body parts selected';
                 display.style.color = '#e74c3c';
             } else {
                 const parts = Array.from(this.selectedBodyParts)
                     .map(id => this.bodyParts.find(p => p.id === id)?.label || id)
                     .slice(0, 3)
                     .join(', ');
-                const remaining = count > 3 ? ` (+${count - 3} więcej)` : '';
+                const remaining = count > 3 ? ` (+${count - 3} more)` : '';
                 display.textContent = `${parts}${remaining}`;
                 display.style.color = '#3498db';
             }
