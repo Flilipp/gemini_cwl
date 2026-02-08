@@ -56,8 +56,8 @@
                             <div class="control-group">
                                 <label>Tryb Wykrywania:</label>
                                 <select id="detectionMode">
-                                    <option value="nsfw">🔞 Treści NSFW</option>
-                                    <option value="objects">📦 Wykrywanie Obiektów</option>
+                                    <option value="nsfw">🔞 Treści NSFW (całe zdjęcie)</option>
+                                    <option value="bodyparts">🧍 Części Ciała (Beta)</option>
                                 </select>
                                 <small class="hint">Wybierz co ma wykrywać AI</small>
                             </div>
@@ -78,12 +78,6 @@
                                     <input type="checkbox" id="autoDetect" checked>
                                     Automatyczne wykrywanie (AI)
                                 </label>
-                            </div>
-
-                            <div class="control-group" id="areaPercentageGroup">
-                                <label>Obszar Cenzury: <span id="areaPercentageLabel">20%</span></label>
-                                <input type="range" id="areaPercentage" min="10" max="100" value="20" step="5">
-                                <small class="hint">Dostosuj wielkość obszaru cenzury (tylko dla obiektów)</small>
                             </div>
 
                             <div class="control-group">
@@ -269,7 +263,7 @@
 
     <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@4.11.0"></script>
     <script src="https://cdn.jsdelivr.net/npm/@tensorflow-models/body-pix@2.2.0"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@tensorflow-models/pose-detection@2.0.0"></script>
+    <script src="https://unpkg.com/nsfwjs@2.4.2/dist/nsfwjs.min.js"></script>
     <script src="app.js"></script>
 </body>
 </html>

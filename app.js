@@ -6,6 +6,7 @@ class CensorCraft {
         this.overlayCanvas = document.getElementById('overlayCanvas');
         this.overlayCtx = this.overlayCanvas.getContext('2d');
         this.bodyPixModel = null;  // For body part segmentation
+        this.nsfwModel = null;     // For NSFW content detection
         this.image = null;
         this.originalImage = null;
         this.censorAreas = [];
@@ -34,22 +35,35 @@ class CensorCraft {
         this.historyIndex = -1;
         this.maxHistory = 20;
         
-        // Body parts for Beta community censorship
-        this.bodyParts = [
-            { id: 'face', label: 'Twarz', description: 'Cała twarz', bodyPixParts: [0, 1] },  // left_face, right_face
-            { id: 'eyes', label: 'Oczy', description: 'Tylko oczy', bodyPixParts: [0, 1] },  // part of face
-            { id: 'chest', label: 'Piersi/Klatka', description: 'Obszar klatki piersiowej', bodyPixParts: [12, 13] },  // torso_front
-            { id: 'hands', label: 'Ręce', description: 'Dłonie', bodyPixParts: [10, 11] },  // left_hand, right_hand
-            { id: 'armpits', label: 'Pachy', description: 'Obszar pod pachami', bodyPixParts: [4, 5] },  // left_upper_arm_front, right_upper_arm_front
-            { id: 'navel', label: 'Pępek', description: 'Brzuch/Pępek', bodyPixParts: [12, 13] },  // torso_front
-            { id: 'genitals', label: 'Genitalia', description: 'Obszar intymny', bodyPixParts: [14, 15, 16, 17] },  // upper/lower legs
-            { id: 'feet', label: 'Stopy', description: 'Stopy', bodyPixParts: [20, 21] },  // left_foot, right_foot
-            { id: 'legs', label: 'Nogi', description: 'Całe nogi', bodyPixParts: [14, 15, 16, 17, 18, 19, 20, 21] },  // all leg parts
-            { id: 'buttocks', label: 'Pośladki', description: 'Tyłek', bodyPixParts: [22, 23] }  // torso_back
+        // NSFW categories for detection
+        this.nsfwCategories = [
+            { id: 'Porn', label: 'Pornografia', description: 'Wyraźne treści seksualne' },
+            { id: 'Hentai', label: 'Hentai', description: 'Animowane treści dla dorosłych' },
+            { id: 'Sexy', label: 'Prowokacyjne', description: 'Sugestywne, ale nie jednoznaczne' }
         ];
         
-        // Selected body parts to censor (default: face and genitals for Beta community)
-        this.selectedBodyParts = new Set(['face', 'genitals']);
+        // Body parts for Beta community censorship
+        this.bodyParts = [
+            { id: 'face', label: 'Twarz', description: 'Cała twarz', bodyPixParts: [0, 1] },
+            { id: 'eyes', label: 'Oczy', description: 'Tylko oczy (górna część twarzy)', bodyPixParts: [0, 1] },
+            { id: 'chest', label: 'Piersi/Klatka', description: 'Obszar klatki piersiowej', bodyPixParts: [12, 13] },
+            { id: 'hands', label: 'Ręce/Dłonie', description: 'Dłonie i przedramiona', bodyPixParts: [6, 7, 8, 9, 10, 11] },
+            { id: 'armpits', label: 'Pachy', description: 'Obszar pod pachami', bodyPixParts: [4, 5] },
+            { id: 'navel', label: 'Brzuch/Pępek', description: 'Brzuch i okolice pępka', bodyPixParts: [12, 13] },
+            { id: 'genitals', label: 'Genitalia', description: 'Obszar intymny', bodyPixParts: [14, 15, 16, 17] },
+            { id: 'feet', label: 'Stopy', description: 'Stopy', bodyPixParts: [20, 21] },
+            { id: 'legs', label: 'Nogi', description: 'Całe nogi', bodyPixParts: [14, 15, 16, 17, 18, 19, 20, 21] },
+            { id: 'buttocks', label: 'Pośladki', description: 'Tyłek', bodyPixParts: [22, 23] }
+        ];
+        
+        // Detection mode: 'nsfw' or 'bodyparts'
+        this.detectionMode = 'nsfw';
+        
+        // Selected NSFW categories to censor (default: explicit content)
+        this.selectedNSFWCategories = new Set(['Porn', 'Hentai']);
+        
+        // Selected body parts to censor (default: none initially for Beta users to choose)
+        this.selectedBodyParts = new Set([]);
         
         this.initializeElements();
         this.attachEventListeners();
@@ -104,6 +118,9 @@ class CensorCraft {
         this.selectAllCategoriesBtn = document.getElementById('selectAllCategories');
         this.deselectAllCategoriesBtn = document.getElementById('deselectAllCategories');
         this.categoryGrid = document.getElementById('categoryGrid');
+        
+        // Detection mode selector
+        this.detectionModeSelect = document.getElementById('detectionMode');
         
         // Initialize category grid
         this.initializeCategoryGrid();
@@ -235,6 +252,13 @@ class CensorCraft {
         this.selectAllCategoriesBtn.addEventListener('click', () => this.selectAllCategories());
         this.deselectAllCategoriesBtn.addEventListener('click', () => this.deselectAllCategories());
         
+        // Detection mode change
+        this.detectionModeSelect.addEventListener('change', (e) => {
+            this.detectionMode = e.target.value;
+            this.initializeCategoryGrid();
+            this.updateCategoryDisplay();
+        });
+        
         // Close modal when clicking outside
         this.categoryModal.addEventListener('click', (e) => {
             if (e.target === this.categoryModal) {
@@ -246,43 +270,83 @@ class CensorCraft {
     initializeCategoryGrid() {
         this.categoryGrid.innerHTML = '';
         
-        // Show body part categories for Beta community
-        this.bodyParts.forEach(bodyPart => {
-            const item = document.createElement('div');
-            item.className = 'category-item';
-            if (this.selectedBodyParts.has(bodyPart.id)) {
-                item.classList.add('selected');
-            }
-            
-            const checkbox = document.createElement('input');
-            checkbox.type = 'checkbox';
-            checkbox.id = `category-${bodyPart.id}`;
-            checkbox.checked = this.selectedBodyParts.has(bodyPart.id);
-            
-            const label = document.createElement('label');
-            label.htmlFor = checkbox.id;
-            label.innerHTML = `<strong>${bodyPart.label}</strong><br><small style="color: #666;">${bodyPart.description}</small>`;
-            
-            checkbox.addEventListener('change', () => {
-                this.toggleBodyPart(bodyPart.id);
-                if (checkbox.checked) {
+        if (this.detectionMode === 'nsfw') {
+            // Show NSFW categories
+            this.nsfwCategories.forEach(category => {
+                const item = document.createElement('div');
+                item.className = 'category-item';
+                if (this.selectedNSFWCategories.has(category.id)) {
                     item.classList.add('selected');
-                } else {
-                    item.classList.remove('selected');
                 }
+                
+                const checkbox = document.createElement('input');
+                checkbox.type = 'checkbox';
+                checkbox.id = `category-${category.id}`;
+                checkbox.checked = this.selectedNSFWCategories.has(category.id);
+                
+                const label = document.createElement('label');
+                label.htmlFor = checkbox.id;
+                label.innerHTML = `<strong>${category.label}</strong><br><small style="color: #666;">${category.description}</small>`;
+                
+                checkbox.addEventListener('change', () => {
+                    this.toggleNSFWCategory(category.id);
+                    if (checkbox.checked) {
+                        item.classList.add('selected');
+                    } else {
+                        item.classList.remove('selected');
+                    }
+                });
+                
+                item.addEventListener('click', (e) => {
+                    if (e.target !== checkbox) {
+                        checkbox.checked = !checkbox.checked;
+                        checkbox.dispatchEvent(new Event('change'));
+                    }
+                });
+                
+                item.appendChild(checkbox);
+                item.appendChild(label);
+                this.categoryGrid.appendChild(item);
             });
-            
-            item.addEventListener('click', (e) => {
-                if (e.target !== checkbox) {
-                    checkbox.checked = !checkbox.checked;
-                    checkbox.dispatchEvent(new Event('change'));
+        } else {
+            // Show body part categories
+            this.bodyParts.forEach(bodyPart => {
+                const item = document.createElement('div');
+                item.className = 'category-item';
+                if (this.selectedBodyParts.has(bodyPart.id)) {
+                    item.classList.add('selected');
                 }
+                
+                const checkbox = document.createElement('input');
+                checkbox.type = 'checkbox';
+                checkbox.id = `category-${bodyPart.id}`;
+                checkbox.checked = this.selectedBodyParts.has(bodyPart.id);
+                
+                const label = document.createElement('label');
+                label.htmlFor = checkbox.id;
+                label.innerHTML = `<strong>${bodyPart.label}</strong><br><small style="color: #666;">${bodyPart.description}</small>`;
+                
+                checkbox.addEventListener('change', () => {
+                    this.toggleBodyPart(bodyPart.id);
+                    if (checkbox.checked) {
+                        item.classList.add('selected');
+                    } else {
+                        item.classList.remove('selected');
+                    }
+                });
+                
+                item.addEventListener('click', (e) => {
+                    if (e.target !== checkbox) {
+                        checkbox.checked = !checkbox.checked;
+                        checkbox.dispatchEvent(new Event('change'));
+                    }
+                });
+                
+                item.appendChild(checkbox);
+                item.appendChild(label);
+                this.categoryGrid.appendChild(item);
             });
-            
-            item.appendChild(checkbox);
-            item.appendChild(label);
-            this.categoryGrid.appendChild(item);
-        });
+        }
     }
     
     openCategoryModal() {
@@ -312,24 +376,30 @@ class CensorCraft {
     async loadModel() {
         try {
             this.showLoading(true);
-            console.log('Ładowanie modelu BodyPix...');
+            console.log('Ładowanie modeli AI...');
             
-            // Load BodyPix with MobileNetV1 architecture (faster)
-            this.bodyPixModel = await bodyPix.load({
-                architecture: 'MobileNetV1',
-                outputStride: 16,
-                multiplier: 0.75,
-                quantBytes: 2
-            });
+            // Load both models in parallel for faster startup
+            const [bodyPixModel, nsfwModel] = await Promise.all([
+                bodyPix.load({
+                    architecture: 'MobileNetV1',
+                    outputStride: 16,
+                    multiplier: 0.75,
+                    quantBytes: 2
+                }),
+                nsfwjs.load()
+            ]);
             
-            console.log('Model BodyPix załadowany pomyślnie!');
+            this.bodyPixModel = bodyPixModel;
+            this.nsfwModel = nsfwModel;
+            
+            console.log('Modele załadowane pomyślnie!');
             this.showLoading(false);
             
             // Update category display after loading
             this.updateCategoryDisplay();
         } catch (error) {
-            console.error('Błąd ładowania modelu:', error);
-            alert('Nie udało się załadować modelu AI. Sprawdź połączenie internetowe.');
+            console.error('Błąd ładowania modeli:', error);
+            alert('Nie udało się załadować modeli AI. Sprawdź połączenie internetowe.');
             this.showLoading(false);
         }
     }
@@ -635,7 +705,7 @@ class CensorCraft {
         if (this.detectionMode === 'nsfw') {
             await this.detectNSFW();
         } else {
-            await this.detectObjects();
+            await this.detectBodyParts();
         }
     }
     
@@ -664,7 +734,6 @@ class CensorCraft {
                 alert(`Nie wykryto treści NSFW (${categoriesText}) na tym zdjęciu.`);
             } else {
                 // NSFW model classifies whole image, so censor the entire image
-                // or we can censor based on confidence threshold
                 const highestNSFW = nsfwDetected[0];
                 const confidenceThreshold = this.confidenceSlider.value / 100;
                 
@@ -694,40 +763,93 @@ class CensorCraft {
         }
     }
     
-    async detectObjects() {
-        if (!this.cocoModel) {
-            alert('Model wykrywania obiektów nie jest jeszcze załadowany. Proszę czekać...');
+    async detectBodyParts() {
+        if (!this.bodyPixModel) {
+            alert('Model wykrywania części ciała nie jest jeszcze załadowany. Proszę czekać...');
+            return;
+        }
+        
+        if (this.selectedBodyParts.size === 0) {
+            alert('Wybierz przynajmniej jedną część ciała do cenzury.');
             return;
         }
 
         this.showLoading(true);
         
         try {
-            const predictions = await this.cocoModel.detect(this.canvas);
-            console.log('Wykryto obiekty:', predictions);
-
-            const confidenceThreshold = this.confidenceSlider.value / 100;
-            const detectedObjects = predictions.filter(p => 
-                this.selectedCategories.has(p.class) && p.score >= confidenceThreshold
-            );
+            // Perform body part segmentation
+            const segmentation = await this.bodyPixModel.segmentPersonParts(this.canvas);
+            console.log('Segmentacja części ciała:', segmentation);
             
-            if (detectedObjects.length === 0) {
-                const categoriesText = Array.from(this.selectedCategories).join(', ');
-                alert(`Nie wykryto żadnych obiektów (${categoriesText}) na zdjęciu z wybranym poziomem pewności.`);
-            } else {
-                const areaPercentage = this.areaPercentageSlider.value / 100;
-                
-                detectedObjects.forEach(obj => {
-                    const [x, y, w, h] = obj.bbox;
-                    const censorHeight = h * areaPercentage;
-                    const censorY = y;
-                    
+            if (!segmentation || segmentation.allPoses.length === 0) {
+                alert('Nie wykryto osoby na zdjęciu.');
+                this.showLoading(false);
+                return;
+            }
+            
+            // Get all body part IDs we want to censor
+            const partsToCensor = new Set();
+            this.selectedBodyParts.forEach(partId => {
+                const bodyPart = this.bodyParts.find(p => p.id === partId);
+                if (bodyPart) {
+                    bodyPart.bodyPixParts.forEach(pixPart => partsToCensor.add(pixPart));
+                }
+            });
+            
+            // Create mask from segmentation data
+            const { width, height, data } = segmentation;
+            const imageData = this.ctx.getImageData(0, 0, width, height);
+            
+            // Find bounding boxes for selected body parts
+            const partMasks = {};
+            for (let i = 0; i < data.length; i++) {
+                const partId = data[i];
+                if (partId >= 0 && partsToCensor.has(partId)) {
+                    if (!partMasks[partId]) {
+                        partMasks[partId] = {
+                            minX: width,
+                            minY: height,
+                            maxX: 0,
+                            maxY: 0,
+                            pixels: []
+                        };
+                    }
+                    const x = i % width;
+                    const y = Math.floor(i / width);
+                    partMasks[partId].minX = Math.min(partMasks[partId].minX, x);
+                    partMasks[partId].minY = Math.min(partMasks[partId].minY, y);
+                    partMasks[partId].maxX = Math.max(partMasks[partId].maxX, x);
+                    partMasks[partId].maxY = Math.max(partMasks[partId].maxY, y);
+                    partMasks[partId].pixels.push({x, y});
+                }
+            }
+            
+            // Add censor areas for detected body parts
+            Object.values(partMasks).forEach(mask => {
+                if (mask.pixels.length > 0) {
                     this.censorAreas.push({
-                        x: x,
-                        y: censorY,
-                        width: w,
-                        height: censorHeight
+                        x: mask.minX,
+                        y: mask.minY,
+                        width: mask.maxX - mask.minX,
+                        height: mask.maxY - mask.minY
                     });
+                }
+            });
+            
+            if (this.censorAreas.length === 0) {
+                alert('Nie wykryto wybranych części ciała na zdjęciu.');
+            } else {
+                this.saveState();
+                this.applyCensorship();
+                alert(`Wykryto i ocenzurowano ${Object.keys(partMasks).length} części ciała.`);
+            }
+        } catch (error) {
+            console.error('Błąd wykrywania części ciała:', error);
+            alert('Wystąpił błąd podczas wykrywania części ciała.');
+        } finally {
+            this.showLoading(false);
+        }
+    }
                 });
                 
                 this.saveState();
@@ -1020,50 +1142,90 @@ class CensorCraft {
         this.redoBtn.disabled = this.historyIndex >= this.history.length - 1;
     }
     
-    toggleCategory(category) {
-        if (this.selectedCategories.has(category)) {
-            this.selectedCategories.delete(category);
+    toggleNSFWCategory(categoryId) {
+        if (this.selectedNSFWCategories.has(categoryId)) {
+            this.selectedNSFWCategories.delete(categoryId);
         } else {
-            this.selectedCategories.add(category);
+            this.selectedNSFWCategories.add(categoryId);
+        }
+        this.updateCategoryDisplay();
+    }
+    
+    toggleBodyPart(partId) {
+        if (this.selectedBodyParts.has(partId)) {
+            this.selectedBodyParts.delete(partId);
+        } else {
+            this.selectedBodyParts.add(partId);
         }
         this.updateCategoryDisplay();
     }
     
     selectAllCategories() {
-        this.selectedCategories = new Set(this.cocoCategories);
+        if (this.detectionMode === 'nsfw') {
+            this.selectedNSFWCategories = new Set(this.nsfwCategories.map(c => c.id));
+        } else {
+            this.selectedBodyParts = new Set(this.bodyParts.map(p => p.id));
+        }
         this.updateCategoryCheckboxes();
         this.updateCategoryDisplay();
     }
     
     deselectAllCategories() {
-        this.selectedCategories.clear();
+        if (this.detectionMode === 'nsfw') {
+            this.selectedNSFWCategories.clear();
+        } else {
+            this.selectedBodyParts.clear();
+        }
         this.updateCategoryCheckboxes();
         this.updateCategoryDisplay();
     }
     
     updateCategoryCheckboxes() {
-        this.cocoCategories.forEach(category => {
-            const checkbox = document.getElementById(`category-${category.replace(/\s+/g, '-')}`);
-            if (checkbox) {
-                checkbox.checked = this.selectedCategories.has(category);
-            }
-        });
+        if (this.detectionMode === 'nsfw') {
+            this.nsfwCategories.forEach(category => {
+                const checkbox = document.getElementById(`category-${category.id}`);
+                if (checkbox) {
+                    checkbox.checked = this.selectedNSFWCategories.has(category.id);
+                }
+            });
+        } else {
+            this.bodyParts.forEach(part => {
+                const checkbox = document.getElementById(`category-${part.id}`);
+                if (checkbox) {
+                    checkbox.checked = this.selectedBodyParts.has(part.id);
+                }
+            });
+        }
     }
     
     updateCategoryDisplay() {
         const display = document.getElementById('selectedCategoriesDisplay');
-        if (display) {
-            const count = this.selectedCategories.size;
+        if (!display) return;
+        
+        if (this.detectionMode === 'nsfw') {
+            const count = this.selectedNSFWCategories.size;
             if (count === 0) {
                 display.textContent = 'Brak wybranych kategorii';
                 display.style.color = '#e74c3c';
-            } else if (count === this.cocoCategories.length) {
-                display.textContent = 'Wszystkie kategorie wybrane';
-                display.style.color = '#27ae60';
             } else {
-                const categories = Array.from(this.selectedCategories).slice(0, 3).join(', ');
+                const categories = Array.from(this.selectedNSFWCategories)
+                    .map(id => this.nsfwCategories.find(c => c.id === id)?.label || id)
+                    .join(', ');
+                display.textContent = categories;
+                display.style.color = '#3498db';
+            }
+        } else {
+            const count = this.selectedBodyParts.size;
+            if (count === 0) {
+                display.textContent = 'Brak wybranych części ciała';
+                display.style.color = '#e74c3c';
+            } else {
+                const parts = Array.from(this.selectedBodyParts)
+                    .map(id => this.bodyParts.find(p => p.id === id)?.label || id)
+                    .slice(0, 3)
+                    .join(', ');
                 const remaining = count > 3 ? ` (+${count - 3} więcej)` : '';
-                display.textContent = `${categories}${remaining}`;
+                display.textContent = `${parts}${remaining}`;
                 display.style.color = '#3498db';
             }
         }
