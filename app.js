@@ -247,7 +247,6 @@ class CensorCraft {
                     this.renderImage();
                     this.applyCensorship();
                 }
-                }
             });
         }
         
@@ -611,8 +610,14 @@ class CensorCraft {
                 this.editorSection.style.display = 'block';
                 this.saveState();
                 
-                if (this.autoDetectCheckbox.checked) {
+                // Disable auto-detection on mobile if image is large
+                const shouldAutoDetect = this.autoDetectCheckbox.checked && 
+                    (!this.isMobile || (img.width * img.height < 1000000));
+                
+                if (shouldAutoDetect) {
                     setTimeout(() => this.detectAndCensor(), 500);
+                } else if (this.isMobile && this.autoDetectCheckbox.checked) {
+                    console.log('Auto-detection wyłączone dla dużych obrazów na urządzeniach mobilnych');
                 }
             };
             img.src = e.target.result;
@@ -622,8 +627,9 @@ class CensorCraft {
 
     displayImage() {
         // Resize canvas to fit image while maintaining aspect ratio
-        const maxWidth = 800;
-        const maxHeight = 600;
+        // More aggressive limits for mobile
+        const maxWidth = this.isMobile ? 600 : 800;
+        const maxHeight = this.isMobile ? 450 : 600;
         let width = this.image.width;
         let height = this.image.height;
 
