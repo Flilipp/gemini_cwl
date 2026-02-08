@@ -333,8 +333,9 @@ class CensorCraft {
             g += this.adjustments.brightness;
             b += this.adjustments.brightness;
             
-            // Contrast
-            const contrastFactor = (259 * (this.adjustments.contrast + 255)) / (255 * (259 - this.adjustments.contrast));
+            // Contrast (normalize to -100 to +100 range)
+            const contrastValue = this.adjustments.contrast - 100;
+            const contrastFactor = (259 * (contrastValue + 255)) / (255 * (259 - contrastValue));
             r = contrastFactor * (r - 128) + 128;
             g = contrastFactor * (g - 128) + 128;
             b = contrastFactor * (b - 128) + 128;
@@ -411,8 +412,15 @@ class CensorCraft {
         // Simple sharpening using unsharp mask simulation
         const amount = this.adjustments.sharpness / 100;
         if (amount > 0) {
+            // Create temporary canvas to avoid drawing canvas onto itself
+            const tempCanvas = document.createElement('canvas');
+            tempCanvas.width = this.canvas.width;
+            tempCanvas.height = this.canvas.height;
+            const tempCtx = tempCanvas.getContext('2d');
+            tempCtx.drawImage(this.canvas, 0, 0);
+            
             this.ctx.filter = `contrast(${100 + amount * 20}%)`;
-            this.ctx.drawImage(this.canvas, 0, 0);
+            this.ctx.drawImage(tempCanvas, 0, 0);
             this.ctx.filter = 'none';
         }
     }
@@ -672,7 +680,11 @@ class CensorCraft {
         const img = new Image();
         img.onload = () => {
             this.image = img;
-            this.censorAreas = []; // Clear censor areas after crop
+            // Clear censor areas after crop (inform user via console)
+            if (this.censorAreas.length > 0) {
+                console.log('Uwaga: Obszary cenzury zostały wyczyszczone po przycięciu obrazu.');
+            }
+            this.censorAreas = [];
             this.saveState();
         };
         img.src = this.canvas.toDataURL();
@@ -784,6 +796,8 @@ class CensorCraft {
         // Limit history size
         if (this.history.length > this.maxHistory) {
             this.history.shift();
+            // Keep historyIndex at the end since we removed the oldest item
+            // historyIndex stays the same (pointing to the last item)
         } else {
             this.historyIndex++;
         }
