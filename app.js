@@ -23,6 +23,12 @@ class CensorCraft {
         this.startX = 0;
         this.startY = 0;
         
+        // Model loading state
+        this.modelsLoading = false;
+        this.bodyPixLoading = false;
+        this.nsfwLoading = false;
+        this.isMobile = this.isMobileUserAgent();
+        
         // Image adjustments
         this.adjustments = {
             brightness: 0,
@@ -77,9 +83,44 @@ class CensorCraft {
         // Selected body parts to censor (default: none initially for Beta users to choose)
         this.selectedBodyParts = new Set([]);
         
+        // Censorship settings
+        this.censorColor = '#000000';
+        this.censorOpacity = 1.0;
+        
+        // Pattern configuration
+        this.patternConfig = {
+            stripeWidth: 10,
+            stripeColor1: '#000000',
+            stripeColor2: '#FFFFFF',
+            dotSize: 8,
+            dotSpacing: 15,
+            dotColor: '#000000',
+            gridSize: 20,
+            gridColor: '#000000'
+        };
+        
+        // Mobile auto-detection threshold (in pixels)
+        this.MAX_MOBILE_AUTO_DETECT_PIXELS = 1000000;  // 1 megapixel
+        
+        // Gradient colors (can be customized later)
+        this.gradientColors = [
+            'rgba(0, 0, 0, {opacity})',
+            'rgba(128, 0, 128, {opacity})',
+            'rgba(255, 0, 255, {opacity})'
+        ];
+        
         this.initializeElements();
         this.attachEventListeners();
-        this.loadModel();
+        // Don't load models immediately - use lazy loading instead
+    }
+    
+    isMobileUserAgent() {
+        return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+    }
+    
+    isMobileDevice() {
+        // Dynamic check that considers current window size
+        return this.isMobileUserAgent() || window.innerWidth <= 768;
     }
 
     initializeElements() {
@@ -121,6 +162,13 @@ class CensorCraft {
         this.flipHorizontalBtn = document.getElementById('flipHorizontal');
         this.flipVerticalBtn = document.getElementById('flipVertical');
         this.resetAdjustmentsBtn = document.getElementById('resetAdjustments');
+        
+        // New censorship controls
+        this.censorColorPicker = document.getElementById('censorColor');
+        this.censorOpacitySlider = document.getElementById('censorOpacity');
+        this.opacityLabel = document.getElementById('opacityLabel');
+        this.colorPickerSection = document.getElementById('colorPickerSection');
+        this.opacitySection = document.getElementById('opacitySection');
         
         // Category modal elements
         this.categoryModal = document.getElementById('categoryModal');
@@ -197,10 +245,33 @@ class CensorCraft {
         // Censor style change - show/hide texture upload section
         if (this.censorStyleSelect && this.textureUploadSection) {
             this.censorStyleSelect.addEventListener('change', (e) => {
-                if (e.target.value === 'texture') {
+                const style = e.target.value;
+                
+                // Show texture upload section
+                if (style === 'texture') {
                     this.textureUploadSection.style.display = 'block';
                 } else {
                     this.textureUploadSection.style.display = 'none';
+                }
+                
+                // Show color picker for colorbar
+                if (style === 'colorbar') {
+                    this.colorPickerSection.style.display = 'block';
+                } else {
+                    this.colorPickerSection.style.display = 'none';
+                }
+                
+                // Show opacity control for applicable styles
+                if (['colorbar', 'gradient', 'pattern-stripes', 'pattern-dots', 'pattern-grid'].includes(style)) {
+                    this.opacitySection.style.display = 'block';
+                } else {
+                    this.opacitySection.style.display = 'none';
+                }
+                
+                // Re-apply censorship with new style
+                if (this.censorAreas.length > 0) {
+                    this.renderImage();
+                    this.applyCensorship();
                 }
             });
         }
@@ -221,6 +292,28 @@ class CensorCraft {
         this.confidenceSlider.addEventListener('input', (e) => {
             this.confidenceLabel.textContent = e.target.value + '%';
         });
+        
+        // New censorship controls
+        if (this.censorColorPicker) {
+            this.censorColorPicker.addEventListener('input', (e) => {
+                this.censorColor = e.target.value;
+                if (this.censorAreas.length > 0) {
+                    this.renderImage();
+                    this.applyCensorship();
+                }
+            });
+        }
+        
+        if (this.censorOpacitySlider && this.opacityLabel) {
+            this.censorOpacitySlider.addEventListener('input', (e) => {
+                this.censorOpacity = parseInt(e.target.value) / 100;
+                this.opacityLabel.textContent = e.target.value + '%';
+                if (this.censorAreas.length > 0) {
+                    this.renderImage();
+                    this.applyCensorship();
+                }
+            });
+        }
 
         this.brightnessSlider.addEventListener('input', (e) => {
             this.adjustments.brightness = parseInt(e.target.value);
@@ -418,35 +511,123 @@ class CensorCraft {
     }
 
     async loadModel() {
+        // This is now deprecated - use ensureModelLoaded instead
+        await this.ensureModelsLoaded();
+    }
+    
+    async ensureBodyPixLoaded() {
+        if (this.bodyPixModel) return this.bodyPixModel;
+        if (this.bodyPixLoading) {
+            // Wait for ongoing load
+            while (this.bodyPixLoading && !this.bodyPixModel) {
+                await new Promise(resolve => setTimeout(resolve, 100));
+            }
+            return this.bodyPixModel;
+        }
+        
+        this.bodyPixLoading = true;
         try {
-            this.showLoading(true);
-            console.log('Ładowanie modeli AI...');
+            console.log('Ładowanie modelu BodyPix...');
             
-            // Load both models in parallel for faster startup
-            // BodyPix config: MobileNetV1 for speed, outputStride 16 for balance of speed/accuracy
-            // multiplier 0.75 reduces model size, quantBytes 2 for better mobile performance
-            const [bodyPixModel, nsfwModel] = await Promise.all([
-                bodyPix.load({
-                    architecture: 'MobileNetV1',  // Faster than ResNet50
-                    outputStride: 16,             // Balance between speed (8=slow, 32=fast) and accuracy
-                    multiplier: 0.75,             // Model size multiplier (0.5, 0.75, 1.0) - smaller = faster
-                    quantBytes: 2                 // Quantization (1, 2, 4) - lower = smaller model, faster on mobile
-                }),
-                nsfwjs.load()
-            ]);
+            // Mobile-optimized settings
+            const config = this.isMobileDevice() ? {
+                architecture: 'MobileNetV1',
+                outputStride: 16,
+                multiplier: 0.5,      // Lighter for mobile
+                quantBytes: 2
+            } : {
+                architecture: 'MobileNetV1',
+                outputStride: 16,
+                multiplier: 0.75,     // Better quality for desktop
+                quantBytes: 2
+            };
             
-            this.bodyPixModel = bodyPixModel;
-            this.nsfwModel = nsfwModel;
+            this.bodyPixModel = await this.retryLoad(
+                () => bodyPix.load(config), 
+                3,
+                1000,
+                'BodyPix'
+            );
+            console.log('Model BodyPix załadowany!');
+            return this.bodyPixModel;
+        } catch (error) {
+            console.error('Błąd ładowania modelu BodyPix:', error);
+            throw error;
+        } finally {
+            this.bodyPixLoading = false;
+        }
+    }
+    
+    async ensureNSFWLoaded() {
+        if (this.nsfwModel) return this.nsfwModel;
+        if (this.nsfwLoading) {
+            // Wait for ongoing load
+            while (this.nsfwLoading && !this.nsfwModel) {
+                await new Promise(resolve => setTimeout(resolve, 100));
+            }
+            return this.nsfwModel;
+        }
+        
+        this.nsfwLoading = true;
+        try {
+            console.log('Ładowanie modelu NSFW...');
+            this.nsfwModel = await this.retryLoad(
+                () => nsfwjs.load(), 
+                3,
+                1000,
+                'NSFW'
+            );
+            console.log('Model NSFW załadowany!');
+            return this.nsfwModel;
+        } catch (error) {
+            console.error('Błąd ładowania modelu NSFW:', error);
+            throw error;
+        } finally {
+            this.nsfwLoading = false;
+        }
+    }
+    
+    async ensureModelsLoaded() {
+        if (this.modelsLoading) return;
+        this.modelsLoading = true;
+        
+        try {
+            this.showLoading(true, 'Ładowanie modeli AI...');
             
-            console.log('Modele załadowane pomyślnie!');
+            // Load models based on detection mode to save bandwidth
+            if (this.detectionMode === 'nsfw') {
+                await this.ensureNSFWLoaded();
+            } else {
+                await this.ensureBodyPixLoaded();
+            }
+            
             this.showLoading(false);
-            
-            // Update category display after loading
             this.updateCategoryDisplay();
         } catch (error) {
             console.error('Błąd ładowania modeli:', error);
-            alert('Nie udało się załadować modeli AI. Sprawdź połączenie internetowe.');
             this.showLoading(false);
+            throw error;
+        } finally {
+            this.modelsLoading = false;
+        }
+    }
+    
+    async retryLoad(loadFn, maxRetries = 3, delayMs = 1000, modelName = 'Model') {
+        for (let i = 0; i < maxRetries; i++) {
+            let timeoutId;
+            try {
+                const timeoutPromise = new Promise((_, reject) => {
+                    timeoutId = setTimeout(() => reject(new Error(`${modelName} load timeout after 30s`)), 30000);
+                });
+                const result = await Promise.race([loadFn(), timeoutPromise]);
+                clearTimeout(timeoutId);
+                return result;
+            } catch (error) {
+                if (timeoutId) clearTimeout(timeoutId);
+                console.warn(`Próba ${i + 1}/${maxRetries} nie powiodła się:`, error.message);
+                if (i === maxRetries - 1) throw error;
+                await new Promise(resolve => setTimeout(resolve, delayMs * (i + 1)));
+            }
         }
     }
 
@@ -469,8 +650,14 @@ class CensorCraft {
                 this.editorSection.style.display = 'block';
                 this.saveState();
                 
-                if (this.autoDetectCheckbox.checked) {
+                // Disable auto-detection on mobile if image is large
+                const shouldAutoDetect = this.autoDetectCheckbox.checked && 
+                    (!this.isMobileDevice() || (img.width * img.height < this.MAX_MOBILE_AUTO_DETECT_PIXELS));
+                
+                if (shouldAutoDetect) {
                     setTimeout(() => this.detectAndCensor(), 500);
+                } else if (this.isMobileDevice() && this.autoDetectCheckbox.checked) {
+                    console.log('Auto-detection wyłączone dla dużych obrazów na urządzeniach mobilnych');
                 }
             };
             img.src = e.target.result;
@@ -480,8 +667,9 @@ class CensorCraft {
 
     displayImage() {
         // Resize canvas to fit image while maintaining aspect ratio
-        const maxWidth = 800;
-        const maxHeight = 600;
+        // More aggressive limits for mobile
+        const maxWidth = this.isMobileDevice() ? 600 : 800;
+        const maxHeight = this.isMobileDevice() ? 450 : 600;
         let width = this.image.width;
         let height = this.image.height;
 
@@ -756,14 +944,14 @@ class CensorCraft {
     }
     
     async detectNSFW() {
-        if (!this.nsfwModel) {
-            alert('Model NSFW nie jest jeszcze załadowany. Proszę czekać...');
-            return;
-        }
-
-        this.showLoading(true);
+        this.showLoading(true, 'Ładowanie modelu NSFW...');
         
         try {
+            // Ensure NSFW model is loaded
+            await this.ensureNSFWLoaded();
+            
+            this.showLoading(true, 'Wykrywanie treści NSFW...');
+            
             // NSFWJS classifies the entire image
             const predictions = await this.nsfwModel.classify(this.canvas);
             console.log('Predykcje NSFW:', predictions);
@@ -810,19 +998,19 @@ class CensorCraft {
     }
     
     async detectBodyParts() {
-        if (!this.bodyPixModel) {
-            alert('Model wykrywania części ciała nie jest jeszcze załadowany. Proszę czekać...');
-            return;
-        }
-        
         if (this.selectedBodyParts.size === 0) {
             alert('Wybierz przynajmniej jedną część ciała do cenzury.');
             return;
         }
 
-        this.showLoading(true);
+        this.showLoading(true, 'Ładowanie modelu BodyPix...');
         
         try {
+            // Ensure BodyPix model is loaded
+            await this.ensureBodyPixLoaded();
+            
+            this.showLoading(true, 'Wykrywanie części ciała...');
+            
             // Perform body part segmentation
             const segmentation = await this.bodyPixModel.segmentPersonParts(this.canvas);
             console.log('Segmentacja części ciała:', segmentation);
@@ -1084,6 +1272,16 @@ class CensorCraft {
             } else if (style === 'whitebar') {
                 this.ctx.fillStyle = 'white';
                 this.ctx.fillRect(area.x, area.y, area.width, area.height);
+            } else if (style === 'colorbar') {
+                this.colorbarArea(area);
+            } else if (style === 'gradient') {
+                this.gradientArea(area);
+            } else if (style === 'pattern-stripes') {
+                this.stripesArea(area);
+            } else if (style === 'pattern-dots') {
+                this.dotsArea(area);
+            } else if (style === 'pattern-grid') {
+                this.gridArea(area);
             } else if (style === 'pixelate') {
                 this.pixelateArea(area);
             } else if (style === 'blur') {
@@ -1094,6 +1292,86 @@ class CensorCraft {
                 this.textureArea(area);
             }
         });
+    }
+    
+    colorbarArea(area) {
+        this.ctx.globalAlpha = this.censorOpacity;
+        this.ctx.fillStyle = this.censorColor;
+        this.ctx.fillRect(area.x, area.y, area.width, area.height);
+        this.ctx.globalAlpha = 1.0;
+    }
+    
+    gradientArea(area) {
+        const gradient = this.ctx.createLinearGradient(
+            area.x, area.y, 
+            area.x + area.width, area.y + area.height
+        );
+        
+        // Apply gradient colors with opacity
+        this.gradientColors.forEach((color, index) => {
+            const stop = index / (this.gradientColors.length - 1);
+            const colorWithOpacity = color.replace('{opacity}', this.censorOpacity);
+            gradient.addColorStop(stop, colorWithOpacity);
+        });
+        
+        this.ctx.fillStyle = gradient;
+        this.ctx.fillRect(area.x, area.y, area.width, area.height);
+    }
+    
+    stripesArea(area) {
+        this.ctx.globalAlpha = this.censorOpacity;
+        const stripeWidth = this.patternConfig.stripeWidth;
+        
+        for (let x = area.x; x < area.x + area.width; x += stripeWidth * 2) {
+            this.ctx.fillStyle = this.patternConfig.stripeColor1;
+            this.ctx.fillRect(x, area.y, stripeWidth, area.height);
+            this.ctx.fillStyle = this.patternConfig.stripeColor2;
+            this.ctx.fillRect(x + stripeWidth, area.y, stripeWidth, area.height);
+        }
+        
+        this.ctx.globalAlpha = 1.0;
+    }
+    
+    dotsArea(area) {
+        this.ctx.globalAlpha = this.censorOpacity;
+        this.ctx.fillStyle = this.patternConfig.dotColor;
+        const dotSize = this.patternConfig.dotSize;
+        const spacing = this.patternConfig.dotSpacing;
+        
+        for (let y = area.y; y < area.y + area.height; y += spacing) {
+            for (let x = area.x; x < area.x + area.width; x += spacing) {
+                this.ctx.beginPath();
+                this.ctx.arc(x, y, dotSize / 2, 0, Math.PI * 2);
+                this.ctx.fill();
+            }
+        }
+        
+        this.ctx.globalAlpha = 1.0;
+    }
+    
+    gridArea(area) {
+        this.ctx.globalAlpha = this.censorOpacity;
+        this.ctx.strokeStyle = this.patternConfig.gridColor;
+        this.ctx.lineWidth = 2;
+        const gridSize = this.patternConfig.gridSize;
+        
+        // Vertical lines
+        for (let x = area.x; x <= area.x + area.width; x += gridSize) {
+            this.ctx.beginPath();
+            this.ctx.moveTo(x, area.y);
+            this.ctx.lineTo(x, area.y + area.height);
+            this.ctx.stroke();
+        }
+        
+        // Horizontal lines
+        for (let y = area.y; y <= area.y + area.height; y += gridSize) {
+            this.ctx.beginPath();
+            this.ctx.moveTo(area.x, y);
+            this.ctx.lineTo(area.x + area.width, y);
+            this.ctx.stroke();
+        }
+        
+        this.ctx.globalAlpha = 1.0;
     }
 
     pixelateArea(area) {
@@ -1447,8 +1725,14 @@ class CensorCraft {
         }
     }
 
-    showLoading(show) {
+    showLoading(show, message = 'Ładowanie...') {
         this.loading.style.display = show ? 'block' : 'none';
+        if (show && message) {
+            const loadingText = this.loading.querySelector('p');
+            if (loadingText) {
+                loadingText.textContent = message;
+            }
+        }
     }
 }
 

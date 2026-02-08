@@ -29,15 +29,25 @@ Wszystko, co robisz, dzieje się **lokalnie na Twoim urządzeniu**. Twoje pliki 
 
 ## ✨ Kluczowe Funkcje (Zaimplementowane!)
 
-*   ✅ **Automatyczne Wykrywanie:** Sztuczna inteligencja automatycznie rozpoznaje osoby i je cenzuruje (COCO-SSD).
-*   ✅ **Różne Style Cenzury:** Wybieraj spośród czarnych pasków, pikselizacji i rozmycia.
-*   ✅ **Pełna Kontrola Ręczna:** Tryb rysowania - zaznaczaj własne obszary do ocenzurowania.
+*   ✅ **Automatyczne Wykrywanie:** Sztuczna inteligencja automatycznie rozpoznaje treści NSFW i części ciała do ocenzurowania.
+*   ✅ **Inteligentne Ładowanie Modeli:** Modele AI ładują się tylko kiedy są potrzebne (lazy loading) z automatyczną obsługą błędów i powtórzeń.
+*   ✅ **Optymalizacja Mobilna:** Automatyczne dostosowanie wydajności do urządzeń mobilnych dla płynnej pracy.
+*   ✅ **Rozbudowane Style Cenzury:** 11 różnych stylów - paski, pikselizacja, rozmycie, emoji, gradienty, wzory i więcej!
+*   ✅ **Dostosowywalna Cenzura:** Własny kolor, tekstura i regulowana przezroczystość dla każdego stylu.
+*   ✅ **Pełna Kontrola Ręczna:** Tryb rysowania - zaznaczaj własne obszary do ocenzurowania (prostokąty i łuki).
+*   ✅ **Zaawansowana Edycja:** Regulacje obrazu, filtry, transformacje, cofnij/ponów.
 *   ✅ **Przetwarzanie po Stronie Klienta:** 100% prywatności. Aplikacja działa w przeglądarce, a Twoje pliki nie są nigdzie wysyłane.
 *   ✅ **Darmowe i Open-Source:** Na zawsze, dla wszystkich. Bez reklam, bez subskrypcji.
 
 ## 🚀 Jak to Działa? (Technologia)
 
 Magia dzieje się dzięki bibliotece **TensorFlow.js**. Pozwala ona na uruchamianie modeli sztucznej inteligencji bezpośrednio w przeglądarce. Oznacza to, że cała "ciężka praca" związana z analizą obrazu jest wykonywana przez Twój komputer lub telefon, a nie przez nasz serwer (bo go nie potrzebujemy!).
+
+**Nowe ulepszenia:**
+- **Lazy Loading:** Modele AI ładują się tylko gdy są potrzebne, oszczędzając przepustowość
+- **Retry Logic:** Automatyczne ponawianie przy błędach połączenia
+- **Mobile Optimization:** Lżejsze modele (MobileNetV1 0.5x) i mniejsze rozmiary canvas na urządzeniach mobilnych
+- **Smart Detection:** Inteligentne zarządzanie pamięcią i wydajnością
 
 ## 💖 Chcesz Pomóc? Jesteś w dobrym miejscu!
 

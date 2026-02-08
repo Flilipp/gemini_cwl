@@ -64,10 +64,33 @@ Dostępne są różne style cenzury:
 - **Rozmycie** - efekt gaussowskiego rozmycia
 - **Emoji 😎** - zabawne emotikony jako cenzura
 - **Biały Pasek** - białe prostokąty
-- **Własna Tekstura 🎨** - użyj własnego wzoru do cenzury
+- **Gradient 🌈** - płynne przejścia kolorów (NOWE!)
+- **Wzór: Paski 📏** - wzór w paski (NOWE!)
+- **Wzór: Kropki ⚫** - wzór w kropki (NOWE!)
+- **Wzór: Kratka 🔲** - wzór w kratkę (NOWE!)
+- **Własny Kolor 🎨** - wybierz własny kolor cenzury (NOWE!)
+- **Własna Tekstura 🖼️** - użyj własnego wzoru do cenzury
+
+#### Nowe Funkcje Cenzury:
+
+**Własny Kolor:**
+1. Wybierz "Własny Kolor 🎨" z listy stylów
+2. Pojawi się selektor kolorów
+3. Kliknij na selektor i wybierz dowolny kolor
+4. Dostosuj przezroczystość za pomocą suwaka
+
+**Wzory (Paski, Kropki, Kratka):**
+1. Wybierz jeden z wzorów z listy stylów
+2. Dostosuj przezroczystość za pomocą suwaka "Przezroczystość"
+3. Wzór zostanie zastosowany do wszystkich obszarów cenzury
+
+**Gradient:**
+1. Wybierz "Gradient 🌈" z listy stylów
+2. Gradient automatycznie zastosuje płynne przejście kolorów
+3. Dostosuj przezroczystość dla lepszego efektu
 
 #### Jak używać Własnej Tekstury:
-1. Wybierz "Własna Tekstura 🎨" z listy stylów
+1. Wybierz "Własna Tekstura 🖼️" z listy stylów
 2. Pojawi się przycisk "📁 Wybierz Teksturę"
 3. Kliknij przycisk i wybierz obraz, który chcesz użyć jako wzór cenzury
 4. Tekstura zostanie powtórzona (tiled) na wszystkich obszarach cenzury

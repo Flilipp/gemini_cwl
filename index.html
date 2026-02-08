@@ -70,8 +70,24 @@
                                     <option value="blur">Rozmycie</option>
                                     <option value="emoji">Emoji 😎</option>
                                     <option value="whitebar">Biały Pasek</option>
-                                    <option value="texture">Własna Tekstura 🎨</option>
+                                    <option value="gradient">Gradient 🌈</option>
+                                    <option value="pattern-stripes">Wzór: Paski 📏</option>
+                                    <option value="pattern-dots">Wzór: Kropki ⚫</option>
+                                    <option value="pattern-grid">Wzór: Kratka 🔲</option>
+                                    <option value="colorbar">Własny Kolor 🎨</option>
+                                    <option value="texture">Własna Tekstura 🖼️</option>
                                 </select>
+                            </div>
+                            
+                            <div class="control-group" id="colorPickerSection" style="display: none;">
+                                <label>Wybierz Kolor Cenzury:</label>
+                                <input type="color" id="censorColor" value="#000000" style="width: 100%; height: 40px; cursor: pointer;">
+                            </div>
+                            
+                            <div class="control-group" id="opacitySection" style="display: none;">
+                                <label>Przezroczystość: <span id="opacityLabel">100%</span></label>
+                                <input type="range" id="censorOpacity" min="10" max="100" value="100" step="5">
+                                <small class="hint">Dostosuj przezroczystość warstwy cenzury</small>
                             </div>
 
                             <div class="control-group" id="textureUploadSection" style="display: none;">
