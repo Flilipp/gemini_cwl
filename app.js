@@ -1564,7 +1564,7 @@ class CensorCraft {
 
     // Helper function to create arc path on a context
     createArcPath(ctx, arcPoints) {
-        if (arcPoints.length < 2) return;
+        if (!arcPoints || arcPoints.length < 2) return;
         
         ctx.beginPath();
         ctx.moveTo(arcPoints[0].x, arcPoints[0].y);
