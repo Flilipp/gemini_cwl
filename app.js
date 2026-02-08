@@ -43,17 +43,22 @@ class CensorCraft {
         ];
         
         // Body parts for Beta community censorship
+        // BodyPix part indices reference:
+        // 0,1: left/right face | 2,3: left/right upper arm back | 4,5: left/right upper arm front
+        // 6,7: left/right lower arm back | 8,9: left/right lower arm front | 10,11: left/right hand
+        // 12,13: torso front/back | 14,15: left/right upper leg front | 16,17: left/right upper leg back
+        // 18,19: left/right lower leg front | 20,21: left/right lower leg back | 22,23: left/right foot
         this.bodyParts = [
             { id: 'face', label: 'Twarz', description: 'Cała twarz', bodyPixParts: [0, 1] },
-            { id: 'eyes', label: 'Oczy', description: 'Tylko oczy (górna część twarzy)', bodyPixParts: [0, 1] },
-            { id: 'chest', label: 'Piersi/Klatka', description: 'Obszar klatki piersiowej', bodyPixParts: [12, 13] },
-            { id: 'hands', label: 'Ręce/Dłonie', description: 'Dłonie i przedramiona', bodyPixParts: [6, 7, 8, 9, 10, 11] },
-            { id: 'armpits', label: 'Pachy', description: 'Obszar pod pachami', bodyPixParts: [4, 5] },
-            { id: 'navel', label: 'Brzuch/Pępek', description: 'Brzuch i okolice pępka', bodyPixParts: [12, 13] },
-            { id: 'genitals', label: 'Genitalia', description: 'Obszar intymny', bodyPixParts: [14, 15, 16, 17] },
-            { id: 'feet', label: 'Stopy', description: 'Stopy', bodyPixParts: [20, 21] },
-            { id: 'legs', label: 'Nogi', description: 'Całe nogi', bodyPixParts: [14, 15, 16, 17, 18, 19, 20, 21] },
-            { id: 'buttocks', label: 'Pośladki', description: 'Tyłek', bodyPixParts: [22, 23] }
+            { id: 'eyes', label: 'Oczy', description: 'Tylko oczy (górna część twarzy)', bodyPixParts: [0, 1], customMask: 'upper-face' },  // Will use custom logic for upper portion
+            { id: 'chest', label: 'Piersi/Klatka', description: 'Obszar klatki piersiowej', bodyPixParts: [12] },  // torso front only
+            { id: 'hands', label: 'Ręce/Dłonie', description: 'Dłonie i przedramiona', bodyPixParts: [6, 7, 8, 9, 10, 11] },  // arms and hands
+            { id: 'armpits', label: 'Pachy', description: 'Obszar pod pachami', bodyPixParts: [4, 5] },  // upper arm front
+            { id: 'navel', label: 'Brzuch/Pępek', description: 'Brzuch i okolice pępka', bodyPixParts: [12], customMask: 'lower-torso' },  // Lower part of torso front
+            { id: 'genitals', label: 'Genitalia', description: 'Obszar intymny', bodyPixParts: [14, 15, 16, 17] },  // upper legs (groin area)
+            { id: 'feet', label: 'Stopy', description: 'Stopy', bodyPixParts: [22, 23] },  // feet only
+            { id: 'legs', label: 'Nogi', description: 'Całe nogi (bez stóp)', bodyPixParts: [14, 15, 16, 17, 18, 19, 20, 21] },  // all leg parts
+            { id: 'buttocks', label: 'Pośladki', description: 'Tyłek', bodyPixParts: [13, 16, 17] }  // torso back + upper legs back
         ];
         
         // Detection mode: 'nsfw' or 'bodyparts'
@@ -379,12 +384,14 @@ class CensorCraft {
             console.log('Ładowanie modeli AI...');
             
             // Load both models in parallel for faster startup
+            // BodyPix config: MobileNetV1 for speed, outputStride 16 for balance of speed/accuracy
+            // multiplier 0.75 reduces model size, quantBytes 2 for better mobile performance
             const [bodyPixModel, nsfwModel] = await Promise.all([
                 bodyPix.load({
-                    architecture: 'MobileNetV1',
-                    outputStride: 16,
-                    multiplier: 0.75,
-                    quantBytes: 2
+                    architecture: 'MobileNetV1',  // Faster than ResNet50
+                    outputStride: 16,             // Balance between speed (8=slow, 32=fast) and accuracy
+                    multiplier: 0.75,             // Model size multiplier (0.5, 0.75, 1.0) - smaller = faster
+                    quantBytes: 2                 // Quantization (1, 2, 4) - lower = smaller model, faster on mobile
                 }),
                 nsfwjs.load()
             ]);
