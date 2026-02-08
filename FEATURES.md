@@ -23,6 +23,9 @@
 - [x] **Czarny Pasek** - klasyczna cenzura czarnymi prostokątami
 - [x] **Pikselizacja** - efekt rozmytych pikseli (20x20px bloki)
 - [x] **Rozmycie** - gaussowskie rozmycie obszaru (blur 25px)
+- [x] **Emoji** - cenzura przy użyciu emotikon 😎
+- [x] **Biały Pasek** - cenzura białymi prostokątami
+- [x] **Własna Tekstura** - użyj własnego obrazu jako wzoru cenzury
 - [x] **Przełączanie stylów** - zmiana stylu w locie
 - [x] **Wielokrotne obszary** - możliwość cenzury wielu obszarów jednocześnie
 
@@ -30,7 +33,8 @@
 
 - [x] **Tryb rysowania** - ręczne zaznaczanie obszarów do cenzury
 - [x] **Rysowanie prostokątów** - kliknij i przeciągnij
-- [x] **Podgląd na żywo** - pokazuje prostokąt podczas rysowania
+- [x] **Rysowanie łuków i krzywych** - łącz punkty tworząc płynne krzywe cenzury
+- [x] **Podgląd na żywo** - pokazuje obszar podczas rysowania
 - [x] **Wielokrotne obszary** - dodawaj tyle obszarów ile chcesz
 - [x] **Łączenie AI + ręczne** - użyj obu metod jednocześnie
 - [x] **Przycinanie obrazu** - tryb crop do wycinania fragmentów obrazu
