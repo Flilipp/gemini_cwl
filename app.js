@@ -1,4 +1,8 @@
 // CensorCraft - Main Application with Advanced Editing Features
+
+// Constants
+const ARC_BOUNDING_BOX_PADDING = 20;
+
 class CensorCraft {
     constructor() {
         this.canvas = document.getElementById('canvas');
@@ -1158,6 +1162,14 @@ class CensorCraft {
         
         // Create pattern from texture
         const pattern = this.ctx.createPattern(this.customTexture, 'repeat');
+        if (!pattern) {
+            // Fallback to black bar if pattern creation fails
+            console.warn('Failed to create pattern from texture, using black bar instead');
+            this.ctx.fillStyle = 'black';
+            this.ctx.fillRect(area.x, area.y, area.width, area.height);
+            return;
+        }
+        
         this.ctx.fillStyle = pattern;
         this.ctx.fillRect(area.x, area.y, area.width, area.height);
     }
@@ -1216,11 +1228,10 @@ class CensorCraft {
         });
         
         // Add padding around the arc
-        const padding = 20;
-        minX = Math.max(0, minX - padding);
-        minY = Math.max(0, minY - padding);
-        maxX = Math.min(this.canvas.width, maxX + padding);
-        maxY = Math.min(this.canvas.height, maxY + padding);
+        minX = Math.max(0, minX - ARC_BOUNDING_BOX_PADDING);
+        minY = Math.max(0, minY - ARC_BOUNDING_BOX_PADDING);
+        maxX = Math.min(this.canvas.width, maxX + ARC_BOUNDING_BOX_PADDING);
+        maxY = Math.min(this.canvas.height, maxY + ARC_BOUNDING_BOX_PADDING);
         
         // Create censored area from bounding box
         this.censorAreas.push({
