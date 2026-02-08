@@ -1327,6 +1327,13 @@ class CensorCraft {
         const style = this.censorStyleSelect.value;
 
         this.censorAreas.forEach((area, index) => {
+            // Setup clipping for arc paths
+            if (area.isArcPath && area.arcPoints) {
+                this.ctx.save();
+                this.createArcPath(this.ctx, area.arcPoints);
+                this.ctx.clip();
+            }
+            
             if (style === 'blackbar') {
                 this.ctx.fillStyle = 'black';
                 this.ctx.fillRect(area.x, area.y, area.width, area.height);
@@ -1351,6 +1358,11 @@ class CensorCraft {
                 this.emojiArea(area, index);
             } else if (style === 'texture') {
                 this.textureArea(area);
+            }
+            
+            // Restore context after clipping
+            if (area.isArcPath && area.arcPoints) {
+                this.ctx.restore();
             }
         });
     }
@@ -1550,10 +1562,34 @@ class CensorCraft {
         }
     }
 
+    // Helper function to create arc path on a context
+    createArcPath(ctx, arcPoints) {
+        if (arcPoints.length < 2) return;
+        
+        ctx.beginPath();
+        ctx.moveTo(arcPoints[0].x, arcPoints[0].y);
+        
+        // Use quadratic curves for smooth arcs
+        for (let i = 1; i < arcPoints.length; i++) {
+            if (i < arcPoints.length - 1) {
+                // Calculate control point as midpoint between current and next point
+                const xc = (arcPoints[i].x + arcPoints[i + 1].x) / 2;
+                const yc = (arcPoints[i].y + arcPoints[i + 1].y) / 2;
+                ctx.quadraticCurveTo(arcPoints[i].x, arcPoints[i].y, xc, yc);
+            } else {
+                // Last point
+                ctx.lineTo(arcPoints[i].x, arcPoints[i].y);
+            }
+        }
+        
+        // Close the path back to the first point
+        ctx.closePath();
+    }
+
     createArcCensorArea() {
         if (this.arcPoints.length < 2) return;
         
-        // Find bounding box of all arc points with padding
+        // Find bounding box of all arc points
         let minX = this.arcPoints[0].x;
         let maxX = this.arcPoints[0].x;
         let minY = this.arcPoints[0].y;
@@ -1566,18 +1602,14 @@ class CensorCraft {
             maxY = Math.max(maxY, point.y);
         });
         
-        // Add padding around the arc
-        minX = Math.max(0, minX - ARC_BOUNDING_BOX_PADDING);
-        minY = Math.max(0, minY - ARC_BOUNDING_BOX_PADDING);
-        maxX = Math.min(this.canvas.width, maxX + ARC_BOUNDING_BOX_PADDING);
-        maxY = Math.min(this.canvas.height, maxY + ARC_BOUNDING_BOX_PADDING);
-        
-        // Create censored area from bounding box
+        // Create censored area with arc path information
         this.censorAreas.push({
             x: minX,
             y: minY,
             width: maxX - minX,
-            height: maxY - minY
+            height: maxY - minY,
+            isArcPath: true,
+            arcPoints: [...this.arcPoints]  // Store the actual arc points
         });
         
         this.saveState();
