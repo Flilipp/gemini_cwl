@@ -87,9 +87,15 @@ Zobacz [DEVELOPER.md](DEVELOPER.md) po dokumentację techniczną.
     *   ✅ Dodanie trzech opcji cenzury (czarny pasek, pikselizacja, blur).
     *   ✅ Opcja pobrania ocenzurowanego obrazu.
     *   ✅ Tryb ręcznego rysowania obszarów cenzury.
-*   **[ ] Faza 2: Rozbudowa Funkcji**
-    *   Dodanie większej liczby stylów cenzury (piksele, blur).
-    *   Wprowadzenie narzędzi do manualnej edycji.
+*   **[✅] Faza 2: Rozbudowa Funkcji** - UKOŃCZONE!
+    *   ✅ Dodanie większej liczby stylów cenzury (emoji, biały pasek).
+    *   ✅ Wprowadzenie zaawansowanych narzędzi do manualnej edycji w stylu Adobe:
+        *   ✅ Regulacja jasności, kontrastu, nasycenia
+        *   ✅ Filtry kolorów (czarno-biały, sepia, inwersja)
+        *   ✅ Transformacje (obrót, odbicie lustrzane, przycinanie)
+        *   ✅ Efekty artystyczne (winietowanie, temperatura, ostrość)
+        *   ✅ System cofnij/ponów (undo/redo)
+        *   ✅ Interfejs z zakładkami dla lepszej organizacji
 *   **[ ] Faza 3: Dalszy Rozwój**
     *   Wsparcie dla plików wideo i GIF.
     *   Optymalizacja wydajności.

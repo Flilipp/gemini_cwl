@@ -26,13 +26,24 @@
 - [x] **Przełączanie stylów** - zmiana stylu w locie
 - [x] **Wielokrotne obszary** - możliwość cenzury wielu obszarów jednocześnie
 
-### ✏️ Edycja Ręczna
+### ✏️ Edycja Ręczna i Zaawansowana
 
 - [x] **Tryb rysowania** - ręczne zaznaczanie obszarów do cenzury
 - [x] **Rysowanie prostokątów** - kliknij i przeciągnij
 - [x] **Podgląd na żywo** - pokazuje prostokąt podczas rysowania
 - [x] **Wielokrotne obszary** - dodawaj tyle obszarów ile chcesz
 - [x] **Łączenie AI + ręczne** - użyj obu metod jednocześnie
+- [x] **Przycinanie obrazu** - tryb crop do wycinania fragmentów obrazu
+- [x] **Obrót obrazu** - 90°, 180°, 270°
+- [x] **Odbicie lustrzane** - poziome i pionowe
+- [x] **Jasność** - regulacja jasności obrazu (-100 do +100)
+- [x] **Kontrast** - regulacja kontrastu (0-200%)
+- [x] **Nasycenie** - regulacja nasycenia kolorów (0-200%)
+- [x] **Ostrość** - wyostrzanie lub łagodzenie obrazu
+- [x] **Winietowanie** - przyciemnianie brzegów obrazu
+- [x] **Temperatura kolorów** - cieplejsze/chłodniejsze tony
+- [x] **Filtry kolorów** - czarno-biały, sepia, inwersja, brak
+- [x] **Cofnij/Ponów** - pełna historia zmian (do 20 kroków)
 
 ### 💾 Zapis i Eksport
 
@@ -56,6 +67,9 @@
 - [x] **Loading spinner** - podczas ładowania modelu
 - [x] **Ikony** - wizualne wskaźniki
 - [x] **Tooltips/wskazówki** - pomoc dla użytkownika
+- [x] **System zakładek** - organizacja kontroli (Cenzura, Regulacje, Efekty, Transformacje)
+- [x] **Historia zmian** - przyciski cofnij/ponów
+- [x] **Przyciski efektów** - szybki dostęp do filtrów i transformacji
 
 ### 🔒 Prywatność i Bezpieczeństwo
 
@@ -77,24 +91,33 @@
 
 ## 🚧 Planowane Funkcje (Faza 2 i 3)
 
-### Faza 2: Rozbudowa Funkcji
+### Faza 2: Rozbudowa Funkcji ✅ UKOŃCZONE!
 
-- [ ] **Więcej stylów cenzury**
-  - [ ] Emoji overlay
+- [x] **Więcej stylów cenzury**
+  - [x] Emoji overlay ✅
+  - [x] Biały pasek ✅
   - [ ] Custom obrazy/wzory
   - [ ] Efekt "glitch"
   - [ ] Gradient blur
   
-- [ ] **Zaawansowana edycja**
-  - [ ] Edycja kształtów (koła, wielokąty)
-  - [ ] Rotacja obszarów
-  - [ ] Cofnij/Ponów (undo/redo)
-  - [ ] Historia zmian
+- [x] **Zaawansowana edycja** ✅
+  - [x] Przycinanie obrazu (crop) ✅
+  - [x] Rotacja obrazu ✅
+  - [x] Odbicie lustrzane ✅
+  - [x] Cofnij/Ponów (undo/redo) ✅
+  - [x] Historia zmian ✅
+  - [x] Regulacja jasności ✅
+  - [x] Regulacja kontrastu ✅
+  - [x] Regulacja nasycenia ✅
+  - [x] Ostrość ✅
+  - [x] Winietowanie ✅
+  - [x] Temperatura kolorów ✅
+  - [x] Filtry kolorów (czarno-biały, sepia, inwersja) ✅
   
-- [ ] **Ustawienia**
+- [x] **Ulepszony interfejs** ✅
+  - [x] System zakładek dla organizacji kontroli ✅
+  - [x] Przyciski cofnij/ponów ✅
   - [ ] Zapisywanie preferencji (localStorage)
-  - [ ] Custom rozmiar pikseli
-  - [ ] Custom intensywność blur
   - [ ] Motywy kolorystyczne (light/dark)
 
 ### Faza 3: Dalszy Rozwój
@@ -132,10 +155,10 @@
 ## 📊 Statystyki Implementacji
 
 ### Kod
-- **HTML**: 112 linii
-- **JavaScript**: 357 linii
-- **CSS**: 307 linii
-- **TOTAL**: 776 linii kodu
+- **HTML**: 232 linii
+- **JavaScript**: 900+ linii
+- **CSS**: 400+ linii
+- **TOTAL**: 1532+ linii kodu
 
 ### Pliki
 - `index.html` - główny interfejs
