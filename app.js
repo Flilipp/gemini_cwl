@@ -973,8 +973,16 @@ class CensorCraft {
             
             this.showLoading(true, 'Detecting NSFW content...');
             
+            // Create a temporary canvas with the original unmodified image
+            // This ensures we analyze the original content, not the filtered/transformed version
+            const tempCanvas = document.createElement('canvas');
+            tempCanvas.width = this.originalImage.width;
+            tempCanvas.height = this.originalImage.height;
+            const tempCtx = tempCanvas.getContext('2d');
+            tempCtx.drawImage(this.originalImage, 0, 0);
+            
             // NSFWJS classifies the entire image
-            const predictions = await this.nsfwModel.classify(this.canvas);
+            const predictions = await this.nsfwModel.classify(tempCanvas);
             console.log('NSFW predictions:', predictions);
             
             // Find predictions matching selected categories
