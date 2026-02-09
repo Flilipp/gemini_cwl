@@ -968,6 +968,11 @@ class CensorCraft {
         this.showLoading(true, 'Ładowanie modelu NSFW...');
         
         try {
+            // Validate that an image is loaded
+            if (!this.originalImage) {
+                throw new Error('No image loaded. Please upload an image first.');
+            }
+            
             // Ensure NSFW model is loaded
             await this.ensureNSFWLoaded();
             
