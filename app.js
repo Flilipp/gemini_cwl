@@ -982,6 +982,9 @@ class CensorCraft {
                 this.selectedNSFWCategories.has(p.className)
             );
             
+            // Sort by probability descending to get highest confidence prediction first
+            nsfwDetected.sort((a, b) => b.probability - a.probability);
+            
             if (nsfwDetected.length === 0) {
                 const categoriesText = Array.from(this.selectedNSFWCategories)
                     .map(cat => this.nsfwCategories.find(c => c.id === cat)?.label || cat)
