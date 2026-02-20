@@ -7,64 +7,67 @@
   <link rel="stylesheet" href="styles.css" />
 </head>
 <body>
-  <header>
-    <h1>HOI MVP — Core Mechanics</h1>
-    <p>Minimalny prototyp: ticki, produkcja, walka, skrypty i mapa Europy/świata.</p>
-  </header>
+  <div class="hoi-app">
+    <header>
+      <h1>HOI MVP — Core Mechanics</h1>
+      <p>Minimalny prototyp: ticki, produkcja, walka, skrypty i mapa Europy/świata.</p>
+    </header>
 
-  <main class="grid">
-    <section class="card map-card">
-      <h2>1) Globalna maszyna stanów (mapa)</h2>
-      <p><strong>Godzina:</strong> <span id="hour">0</span></p>
-      <p><strong>Pozycja dywizji:</strong> <span id="division-position">Warszawa</span></p>
+    <main class="grid">
+      <section class="card map-card">
+        <h2>1) Globalna maszyna stanów (mapa)</h2>
+        <p><strong>Godzina:</strong> <span id="hour">0</span></p>
+        <p><strong>Pozycja dywizji:</strong> <span id="division-position">Warszawa</span></p>
 
-      <div class="map-switcher">
-        <button id="map-europe" class="map-btn active">Europa</button>
-        <button id="map-world" class="map-btn">Świat</button>
-      </div>
-
-      <svg id="strategic-map" viewBox="0 0 560 300" role="img" aria-label="Mapa strategiczna"></svg>
-      <div class="nodes" id="nodes"></div>
-      <button id="next-tick">Następny tick (1h)</button>
-    </section>
-
-    <section class="card">
-      <h2>2) Silnik ekonomiczny (production queue)</h2>
-      <p>Fabryki: <span id="factories">5</span> | Surowce: <span id="resources">8</span></p>
-      <p>Efficiency: <span id="efficiency">0%</span></p>
-      <p>Postęp produkcji: <span id="production-progress">0</span>/<span id="production-target">100</span></p>
-      <p>Ekwipunek globalny: <span id="stockpile">0</span></p>
-    </section>
-
-    <section class="card">
-      <h2>3) Combat logic (stat-checker)</h2>
-      <div class="combat-stats">
-        <div>
-          <h3>Nasza dywizja</h3>
-          <p>Soft Attack: <span id="our-soft">24</span></p>
-          <p>Breakthrough: <span id="our-break">18</span></p>
-          <p>Organization: <span id="our-org">100</span></p>
-          <p>Strength: <span id="our-str">100</span></p>
+        <div class="map-switcher">
+          <button id="map-europe" class="map-btn active">Europa</button>
+          <button id="map-world" class="map-btn">Świat</button>
         </div>
-        <div>
-          <h3>Wroga dywizja</h3>
-          <p>Defense: <span id="enemy-def">20</span></p>
-          <p>Hard Attack: <span id="enemy-hard">16</span></p>
-          <p>Organization: <span id="enemy-org">100</span></p>
-          <p>Strength: <span id="enemy-str">100</span></p>
-        </div>
-      </div>
-      <button id="combat-round">Rozegraj rundę walki</button>
-    </section>
 
-    <section class="card">
-      <h2>4) System skryptowy (content layer)</h2>
-      <p>Political Power: <span id="pp">120</span></p>
-      <button id="focus-button">Kliknij focus (koszt 75 PP)</button>
-      <p>Event log:</p>
-      <ul id="event-log"></ul>
-    </section>
-  </main>
+        <svg id="strategic-map" viewBox="0 0 560 300" role="img" aria-label="Mapa strategiczna"></svg>
+        <p id="map-caption" class="map-caption"></p>
+        <div class="nodes" id="nodes"></div>
+        <button id="next-tick">Następny tick (1h)</button>
+      </section>
+
+      <section class="card">
+        <h2>2) Silnik ekonomiczny (production queue)</h2>
+        <p>Fabryki: <span id="factories">5</span> | Surowce: <span id="resources">8</span></p>
+        <p>Efficiency: <span id="efficiency">0%</span></p>
+        <p>Postęp produkcji: <span id="production-progress">0</span>/<span id="production-target">100</span></p>
+        <p>Ekwipunek globalny: <span id="stockpile">0</span></p>
+      </section>
+
+      <section class="card">
+        <h2>3) Combat logic (stat-checker)</h2>
+        <div class="combat-stats">
+          <div>
+            <h3>Nasza dywizja</h3>
+            <p>Soft Attack: <span id="our-soft">24</span></p>
+            <p>Breakthrough: <span id="our-break">18</span></p>
+            <p>Organization: <span id="our-org">100</span></p>
+            <p>Strength: <span id="our-str">100</span></p>
+          </div>
+          <div>
+            <h3>Wroga dywizja</h3>
+            <p>Defense: <span id="enemy-def">20</span></p>
+            <p>Hard Attack: <span id="enemy-hard">16</span></p>
+            <p>Organization: <span id="enemy-org">100</span></p>
+            <p>Strength: <span id="enemy-str">100</span></p>
+          </div>
+        </div>
+        <button id="combat-round">Rozegraj rundę walki</button>
+      </section>
+
+      <section class="card">
+        <h2>4) System skryptowy (content layer)</h2>
+        <p>Political Power: <span id="pp">120</span></p>
+        <button id="focus-button">Kliknij focus (koszt 75 PP)</button>
+        <p>Event log:</p>
+        <ul id="event-log"></ul>
+      </section>
+    </main>
+  </div>
 
   <script src="app.js"></script>
 </body>

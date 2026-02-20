@@ -34,3 +34,8 @@ Na bazie opisu z `HOI/index.html` zbudowałem działające MVP jako prostą apli
 ## Jak uruchomić
 
 Wystarczy otworzyć plik `HOI/index.html` w przeglądarce.
+
+
+## Uwagi integracyjne
+
+- Style zostały ograniczone do kontenera `.hoi-app`, żeby zminimalizować konflikty przy łączeniu z innymi widokami/aplikacjami.

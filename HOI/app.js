@@ -54,6 +54,9 @@ function logEvent(message) {
 function updateMapButtons() {
   byId("map-europe").classList.toggle("active", state.mapMode === "europe");
   byId("map-world").classList.toggle("active", state.mapMode === "world");
+  byId("map-caption").textContent = state.mapMode === "europe"
+    ? "Widok Europy: główne węzły strategiczne frontu kontynentalnego."
+    : "Widok świata: strategiczne punkty międzykontynentalne.";
 }
 
 function renderStrategicMap() {
