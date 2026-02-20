@@ -1,79 +1,566 @@
+/* ══════════════════════════════════════════════════════════════
+   Grand Strategy 1936 — War Room Aesthetics (Overhaul 2.0)
+══════════════════════════════════════════════════════════════ */
+
 :root {
-  color-scheme: dark;
-  font-family: Inter, system-ui, sans-serif;
+    --bg-darkest: #0a0c10;
+    --bg-dark: #12161e;
+    --bg-card: #1a1f2b;
+    --border: #2a3245;
+    --gold: #c8963a;
+    --gold-light: #e8c060;
+    --gold-faded: rgba(200, 150, 58, 0.2);
+    --red: #8b2020;
+    --blue: #1f4a7e;
+    --text: #b0b8c8;
+    --text-bright: #e0e8f0;
+    --font-title: 'Cinzel', serif;
+    --font-body: 'Rajdhani', sans-serif;
+    --radius: 4px;
+
+    /* Alliance Colors */
+    --axis-color: #4a4d52;
+    --allies-color: #3a4d6a;
+    --comintern-color: #7a1a1a;
+    --neutral-color: #f5f1e6;
 }
 
 body {
-  margin: 0;
-  background: #111827;
-  color: #f9fafb;
+    background: var(--bg-darkest);
+    color: var(--text);
+    font-family: var(--font-body);
+    margin: 0;
+    overflow: hidden;
 }
 
-header {
-  padding: 1rem 1.5rem;
-  background: #1f2937;
-  border-bottom: 1px solid #374151;
+/* ══ MAP STYLES ════════════════════════════════════════════ */
+.map-container {
+    background: #080c14;
+    position: relative;
+    overflow: hidden;
+    box-shadow: inset 0 0 100px rgba(0, 0, 0, 0.8);
 }
 
-h1, h2, h3 {
-  margin: 0 0 0.5rem;
+.territory {
+    transition: fill 0.3s, filter 0.3s, stroke 0.3s;
+    cursor: pointer;
 }
 
-.grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-  gap: 1rem;
-  padding: 1rem;
+.territory:hover {
+    filter: url(#bevelFilter) brightness(1.3);
+    stroke: var(--gold-light);
+    stroke-width: 1.5;
 }
 
-.card {
-  background: #1f2937;
-  border: 1px solid #374151;
-  border-radius: 12px;
-  padding: 1rem;
+.territory.selected {
+    stroke: var(--gold);
+    stroke-width: 2.5;
+    filter: url(#glowWar);
 }
 
-button {
-  margin-top: 0.5rem;
-  border: none;
-  border-radius: 8px;
-  padding: 0.6rem 0.9rem;
-  background: #2563eb;
-  color: white;
-  cursor: pointer;
+.territory.at-war {
+    animation: mapPulse 2s infinite ease-in-out;
 }
 
-button:hover {
-  background: #1d4ed8;
+@keyframes mapPulse {
+
+    0%,
+    100% {
+        filter: url(#bevelFilter) saturate(1);
+    }
+
+    50% {
+        filter: url(#bevelFilter) saturate(1.8) brightness(1.2);
+    }
 }
 
-.nodes {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.4rem;
-  margin-bottom: 0.5rem;
+.map-label {
+    fill: rgba(255, 255, 255, 0.4);
+    font-size: 10px;
+    font-weight: 700;
+    pointer-events: none;
+    text-anchor: middle;
+    text-transform: uppercase;
+    letter-spacing: 1px;
 }
 
-.node {
-  border: 1px solid #4b5563;
-  border-radius: 999px;
-  padding: 0.2rem 0.55rem;
-  font-size: 0.9rem;
+/* ══ CITY MARKERS ══════════════════════════════════════════ */
+.city-marker circle {
+    filter: drop-shadow(0 0 5px var(--gold));
+    transition: transform 0.2s;
 }
 
-.node.active {
-  border-color: #10b981;
-  color: #10b981;
+.city-marker:hover circle {
+    transform: scale(1.5);
+    fill: white;
 }
 
-.combat-stats {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 0.8rem;
+.city-label {
+    fill: var(--gold-light);
+    font-size: 9px;
+    font-weight: 700;
+    text-anchor: middle;
+    pointer-events: none;
+    font-family: var(--font-title);
+    filter: drop-shadow(0 0 2px black);
 }
 
-#event-log {
-  max-height: 180px;
-  overflow: auto;
-  padding-left: 1.2rem;
+/* ══ HEADER ════════════════════════════════════════════════ */
+.game-header {
+    background: linear-gradient(180deg, #1a1f2b, #0a0c10);
+    border-bottom: 2px solid var(--border);
+    height: 54px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 20px;
+    z-index: 100;
+}
+
+.hdr-logo {
+    font-family: var(--font-title);
+    color: var(--gold);
+    font-size: 18px;
+    font-weight: 900;
+}
+
+.hdr-country {
+    font-family: var(--font-title);
+    font-size: 20px;
+    color: var(--text-bright);
+}
+
+.hdr-resources {
+    display: flex;
+    gap: 15px;
+    font-size: 13px;
+    font-weight: 600;
+}
+
+/* ══ UI PANELS ═════════════════════════════════════════════ */
+.game-layout {
+    display: grid;
+    grid-template-columns: 1fr 400px;
+    height: calc(100vh - 54px);
+}
+
+.control-panel {
+    background: var(--bg-dark);
+    border-left: 2px solid var(--border);
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+}
+
+.panel-tabs {
+    display: flex;
+    border-bottom: 1px solid var(--border);
+}
+
+.panel-tab {
+    flex: 1;
+    padding: 12px;
+    background: none;
+    border: none;
+    color: var(--text);
+    font-family: var(--font-body);
+    font-weight: 600;
+    cursor: pointer;
+    border-bottom: 3px solid transparent;
+    transition: 0.2s;
+}
+
+.panel-tab.active {
+    color: var(--gold);
+    border-bottom-color: var(--gold);
+    background: rgba(200, 150, 58, 0.1);
+}
+
+.panel-content {
+    flex: 1;
+    overflow-y: auto;
+    padding: 20px;
+}
+
+/* ══ START SCREEN ══════════════════════════════════════════ */
+#start-screen {
+    position: fixed;
+    inset: 0;
+    z-index: 1000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--bg-darkest);
+}
+
+.start-bg {
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(circle at 50% 50%, #1a1f2b 0%, #05070a 100%);
+    opacity: 0.8;
+}
+
+.start-content {
+    position: relative;
+    z-index: 2;
+    text-align: center;
+    max-width: 1000px;
+}
+
+.start-title {
+    font-family: var(--font-title);
+    font-size: 64px;
+    color: var(--gold);
+    margin: 0;
+}
+
+.country-select-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 20px;
+    margin-top: 40px;
+}
+
+.country-card {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    padding: 20px;
+    border-radius: var(--radius);
+    cursor: pointer;
+    transition: 0.3s;
+}
+
+.country-card:hover {
+    border-color: var(--gold);
+    transform: translateY(-5px);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+}
+
+.country-flag {
+    font-size: 40px;
+}
+
+.country-name {
+    font-family: var(--font-title);
+    font-size: 18px;
+    color: var(--text-bright);
+    margin-top: 10px;
+}
+
+/* ══ LOGS & EVENT BOX ══════════════════════════════════════ */
+.event-log-container {
+    background: #0a0c10;
+    border-top: 2px solid var(--border);
+    height: 180px;
+    overflow: hidden;
+}
+
+.log-header {
+    padding: 5px 15px;
+    font-size: 11px;
+    font-weight: 700;
+    color: var(--gold);
+    border-bottom: 1px solid var(--border);
+}
+
+.event-log {
+    padding: 10px 15px;
+    height: 140px;
+    overflow-y: auto;
+    font-size: 12px;
+    color: var(--text);
+}
+
+.log-entry {
+    margin-bottom: 4px;
+    border-left: 2px solid var(--border);
+    padding-left: 8px;
+}
+
+/* Scrollbars */
+::-webkit-scrollbar {
+    width: 6px;
+}
+
+::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+    background: var(--border);
+    border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: var(--gold);
+}
+
+/* Overlays */
+.event-overlay {
+    position: fixed;
+    right: 20px;
+    top: 70px;
+    width: 320px;
+    background: rgba(26, 31, 43, 0.95);
+    border: 1px solid var(--gold);
+    border-radius: var(--radius);
+    padding: 20px;
+    backdrop-filter: blur(10px);
+    transform: translateX(400px);
+    transition: 0.5s;
+    z-index: 1000;
+}
+
+.event-overlay.show {
+    transform: translateX(0);
+}
+
+/* --- Map Overhaul 3.0: Pro Cartography --- */
+.map-section {
+    position: relative;
+    flex: 1;
+    background: #c3d9e9;
+    /* Light, premium blue for the ocean */
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+}
+
+.map-container {
+    position: relative;
+    flex: 1;
+    cursor: grab;
+    background: #c3d9e9;
+    /* Light blue sea */
+}
+
+.map-container:active {
+    cursor: grabbing;
+}
+
+#europe-map svg {
+    width: 100%;
+    height: 100%;
+}
+
+/* Land Styling */
+.territory {
+    fill: #f5f1e6;
+    /* Creamy/Paper land color from reference */
+    stroke: #666e7a;
+    /* Subtle slate border */
+    stroke-width: 0.4px;
+    /* Hairline precision */
+    stroke-linejoin: round;
+    transition: fill 0.2s ease, stroke-width 0.2s ease;
+}
+
+.territory:hover {
+    fill: #ebdfc4;
+    filter: brightness(0.95);
+    stroke-width: 0.8px;
+}
+
+.territory.selected {
+    fill: var(--gold-faded) !important;
+    stroke: var(--gold) !important;
+    stroke-width: 1px !important;
+}
+
+.territory.at-war {
+    stroke: #ff4444;
+    stroke-width: 1.5px;
+    animation: pulseWar 2s infinite;
+}
+
+@keyframes pulseWar {
+    0% {
+        stroke-opacity: 1;
+    }
+
+    50% {
+        stroke-opacity: 0.4;
+    }
+
+    100% {
+        stroke-opacity: 1;
+    }
+}
+
+/* Country Dynamic Colors (applied via inline styles or classes) */
+.country-germany {
+    fill: #4d4d4d;
+}
+
+/* Grey */
+.country-poland {
+    fill: #9e3d3d;
+}
+
+/* Crimson */
+.country-france {
+    fill: #4d669e;
+}
+
+/* French Blue */
+.country-uk {
+    fill: #6e6b4e;
+}
+
+/* Tan/Khaki */
+.country-ussr {
+    fill: #ae3030;
+}
+
+/* Soviet Red */
+.country-italy {
+    fill: #3d6e3d;
+}
+
+/* Italian Green */
+
+/* UI Elements on Map */
+.loading-overlay {
+    position: absolute;
+    inset: 0;
+    background: rgba(10, 12, 18, 0.8);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+    color: var(--gold);
+    font-family: 'Rajdhani', sans-serif;
+    font-size: 1.5rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+}
+
+.map-info-box {
+    position: absolute;
+    bottom: 20px;
+    left: 20px;
+    width: 280px;
+    background: rgba(10, 12, 18, 0.95);
+    border: 1px solid var(--gold);
+    padding: 15px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+    z-index: 100;
+}
+
+.info-title {
+    color: var(--gold);
+    font-family: 'Cinzel', serif;
+    font-size: 1.2rem;
+    font-weight: 700;
+    border-bottom: 1px solid rgba(212, 175, 55, 0.3);
+    margin-bottom: 10px;
+    padding-bottom: 5px;
+}
+
+.info-content {
+    color: #ccc;
+    font-family: 'Rajdhani', sans-serif;
+    font-size: 0.95rem;
+    line-height: 1.4;
+}
+
+.miniwar-btn {
+    width: 100%;
+    margin-top: 15px;
+    background: #8e1a1a;
+    color: white;
+    border: none;
+    padding: 8px;
+    font-family: 'Rajdhani', sans-serif;
+    font-weight: 700;
+    cursor: pointer;
+    transition: 0.2s;
+}
+
+.miniwar-btn:hover {
+    background: #b32424;
+}
+
+.map-legend {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    background: rgba(10, 12, 18, 0.8);
+    backdrop-filter: blur(5px);
+    padding: 10px 15px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    z-index: 50;
+}
+
+.legend-title {
+    color: #eee;
+    font-size: 0.8rem;
+    font-weight: 700;
+    margin-bottom: 8px;
+    text-transform: uppercase;
+}
+
+.legend-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 0.85rem;
+    color: #ccc;
+    margin-bottom: 4px;
+}
+
+.legend-item span {
+    width: 12px;
+    height: 12px;
+    border-radius: 2px;
+}
+
+/* Speed Buttons */
+.speed-btns {
+    display: flex;
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    overflow: hidden;
+}
+
+.speed-btn {
+    padding: 5px 12px;
+    background: var(--bg-dark);
+    border: none;
+    color: var(--text);
+    font-family: var(--font-body);
+    font-weight: 700;
+    cursor: pointer;
+    border-right: 1px solid var(--border);
+}
+
+.speed-btn:last-child {
+    border-right: none;
+}
+
+.speed-btn.active {
+    background: var(--gold);
+    color: black;
+}
+
+.speed-btn:hover:not(.active) {
+    background: var(--bg-card);
+}
+
+.pause-btn {
+    background: var(--gold);
+    color: black;
+    border: none;
+    padding: 6px 15px;
+    font-family: var(--font-body);
+    font-weight: 700;
+    cursor: pointer;
+    border-radius: var(--radius);
+    margin-left: 10px;
+}
+
+.pause-btn.paused {
+    background: var(--red);
+    color: white;
 }

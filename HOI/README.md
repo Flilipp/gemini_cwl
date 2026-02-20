@@ -1,35 +1,63 @@
-# HOI MVP
+# 🎖️ Grand Strategy 1936 — WWII Browser Game
 
-Na bazie opisu z `HOI/index.html` zbudowałem działające MVP jako prostą aplikację front-end (HTML/CSS/JS), która odtwarza 4 główne moduły mechaniczne:
+Gra strategiczna inspirowana Hearts of Iron IV, działająca w przeglądarce. **Single-player** — grasz jednym z 5 mocarstw, reszta sterowana przez AI Boty.
 
-## Co zostało zrobione
+## 🎮 Jak grać
 
-1. **Globalna maszyna stanów (mapa + ticki godzinowe)**
-   - Dodano zegar gry (tick = 1h).
-   - Dodano mini-mapę jako listę połączonych węzłów/prowincji.
-   - Dywizja porusza się po węzłach co kilka ticków.
+1. Otwórz `HOI/index.html` w przeglądarce
+2. Wybierz kraj
+3. Zarządzaj polityką, ekonomią i armią
+4. Zdobądź 60 Victory Points aby wygrać
 
-2. **Silnik ekonomiczny (production queue)**
-   - Symulacja wejścia: fabryki + surowce.
-   - Efficiency rośnie z czasem, przyspieszając produkcję.
-   - Po osiągnięciu progu produkcyjnego dodawany jest ekwipunek do stockpile.
+## 🗺️ Dostępne kraje
 
-3. **Combat logic (stat-checker)**
-   - Jedna runda walki porównuje statystyki obu stron.
-   - Uwzględniono losowy modyfikator (RNG) oraz prosty wpływ warunków (teren/pogoda).
-   - Spadek Organization/Strength.
-   - Jeśli Organization spadnie do 0, uruchamiany jest odwrót (zgodnie z MVP logic).
+| Kraj | Ideologia | AI (gdy bot) | Trudność |
+|-----|-----------|-------------|---------|
+| 🇩🇪 Niemcy | Faszyzm | Ekspansjonista | ★★★★☆ |
+| 🇵🇱 Polska | Demokracja | Obrońca | ★★★★★ |
+| 🇫🇷 Francja | Demokracja | Obrońca | ★★★☆☆ |
+| 🇬🇧 Wielka Brytania | Demokracja | Obrońca | ★★☆☆☆ |
+| 🇷🇺 ZSRR | Komunizm | Industrialista | ★★★☆☆ |
 
-4. **System skryptowy (content layer)**
-   - Przycisk focusa z warunkiem PP >= 75.
-   - Efekt skryptu: -75 PP, +1 fabryka i wpis do event logu (event_id=102).
+## ⚙️ Mechaniki
 
-## Struktura plików
+### 🌲 Fokusy polityczne
+Każdy kraj ma 6-10 unikalnych focusów — wybierz ścieżkę rozwoju (militaryzacja, dyplomacja, gospodarka, sojusze).
 
-- `index.html` — interfejs MVP
-- `styles.css` — styl wizualny paneli
-- `app.js` — logika ticków, ekonomii, walki i skryptów
+### 🏭 Ekonomia
+- Zasoby: Stal (⚙️), Ropa (🛢️), Aluminium, Jedzenie
+- Przemysłowa Pojemność (IC) napędza produkcję
+- Zamów produkcję: karabiny, artyleria, czołgi, samoloty, okręty
 
-## Jak uruchomić
+### 🔬 Technologie
+20 technologii w 4 kategoriach: Lądowe, Lotnicze, Morskie, Przemysłowe.
 
-Wystarczy otworzyć plik `HOI/index.html` w przeglądarce.
+### ⚔️ Armia i walka
+- Jednostki: Piechota, Czołgi, Lotnictwo, Marynarka
+- Deklaruj wojnę przez uzasadnienie (Casus Belli — czeka 8 tygodni)
+- Bitwy rozstrzygane co 4 tygodnie
+
+### 🤝 Dyplomacja
+- 3 bloki: **Oś** (Niemcy), **Alianci** (UK/Francja), **Komintern** (ZSRR)
+- Dołącz do sojuszu → sojusznicy wchodzą do twoich wojen
+
+### 🤖 AI Boty
+- **Ekspansjonista** — atakuje gdy ma przewagę militarną
+- **Obrońca** — szuka sojuszy, buduje obronę
+- **Industrialista** — skupia się na ekonomii, wchodzi w wojny późno
+
+## 📁 Struktura plików
+
+```
+HOI/
+├── index.html    — Główna strona gry (mapa SVG Europy + UI)
+├── styles.css    — Stylizacja (ciemny motyw militarny)
+├── game.js       — Silnik gry (GameEngine, UIController, MapController)
+└── data.js       — Dane gry (kraje, fokusy, technologie, terytoria)
+```
+
+## 🏆 Warunki zwycięstwa
+
+- Zbierz **60 Victory Points** (VP zdobywane za terytoria)
+- Lub miej więcej VP niż AI po **roku 1945**
+- Przegrasz jeśli Twój kraj zostanie całkowicie podbity

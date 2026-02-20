@@ -1,64 +1,132 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="pl">
+
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>HOI MVP — Symulator Core Mechanics</title>
-  <link rel="stylesheet" href="styles.css" />
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Grand Strategy 1936 — War Room</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700;900&family=Rajdhani:wght@400;500;600;700&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+    <!-- Map Libraries -->
+    <script src="https://d3js.org/d3.v7.min.js"></script>
+    <script src="https://unpkg.com/topojson@3"></script>
 </head>
+
 <body>
-  <header>
-    <h1>HOI MVP — Core Mechanics</h1>
-    <p>Minimalny prototyp: ticki, produkcja, walka i skrypty decyzyjne.</p>
-  </header>
 
-  <main class="grid">
-    <section class="card">
-      <h2>1) Globalna maszyna stanów (mapa)</h2>
-      <p><strong>Godzina:</strong> <span id="hour">0</span></p>
-      <p><strong>Pozycja dywizji:</strong> <span id="division-position">Warszawa</span></p>
-      <div class="nodes" id="nodes"></div>
-      <button id="next-tick">Następny tick (1h)</button>
-    </section>
-
-    <section class="card">
-      <h2>2) Silnik ekonomiczny (production queue)</h2>
-      <p>Fabryki: <span id="factories">5</span> | Surowce: <span id="resources">8</span></p>
-      <p>Efficiency: <span id="efficiency">0%</span></p>
-      <p>Postęp produkcji: <span id="production-progress">0</span>/<span id="production-target">100</span></p>
-      <p>Ekwipunek globalny: <span id="stockpile">0</span></p>
-    </section>
-
-    <section class="card">
-      <h2>3) Combat logic (stat-checker)</h2>
-      <div class="combat-stats">
-        <div>
-          <h3>Nasza dywizja</h3>
-          <p>Soft Attack: <span id="our-soft">24</span></p>
-          <p>Breakthrough: <span id="our-break">18</span></p>
-          <p>Organization: <span id="our-org">100</span></p>
-          <p>Strength: <span id="our-str">100</span></p>
+    <div id="start-screen">
+        <div class="start-bg"></div>
+        <div class="start-content">
+            <div class="start-title-block">
+                <div class="start-subtitle">GRAND STRATEGY • 1936</div>
+                <div class="start-title">EUROPA W OGNIU</div>
+                <div class="start-desc">II Wojna Światowa — Overhaul 2.0</div>
+            </div>
+            <div class="country-select-grid" id="country-grid"></div>
         </div>
-        <div>
-          <h3>Wroga dywizja</h3>
-          <p>Defense: <span id="enemy-def">20</span></p>
-          <p>Hard Attack: <span id="enemy-hard">16</span></p>
-          <p>Organization: <span id="enemy-org">100</span></p>
-          <p>Strength: <span id="enemy-str">100</span></p>
+    </div>
+
+    <div id="game-ui" style="display:none">
+        <header class="game-header">
+            <div class="hdr-left">
+                <span class="hdr-logo">⚔️ 1936</span>
+                <span id="hdr-date" class="hdr-date">1936 • W1</span>
+            </div>
+            <div class="hdr-center">
+                <div id="hdr-country" class="hdr-country">Niemcy</div>
+                <div class="hdr-resources">
+                    <span>⚙️ <b id="hdr-steel">0</b></span>
+                    <span>🛢️ <b id="hdr-oil">0</b></span>
+                    <span>🏗️ <b id="hdr-ic">0</b></span>
+                    <span>🏆 <b id="hdr-vp">0</b> VP</span>
+                    <span>📊 <b id="hdr-stability">0</b>%</span>
+                </div>
+            </div>
+            <div class="hdr-right">
+                <div class="speed-control">
+                    <div class="speed-btns" id="speed-btns">
+                        <button class="speed-btn" data-idx="0">x4</button>
+                        <button class="speed-btn" data-idx="1">x2</button>
+                        <button class="speed-btn active" data-idx="2">x1</button>
+                        <button class="speed-btn" data-idx="3">½x</button>
+                    </div>
+                </div>
+                <button id="btn-pause" class="pause-btn">⏸ PAUZA</button>
+            </div>
+        </header>
+
+        <div class="game-layout">
+            <div class="map-section">
+                <div class="map-container" id="map-container">
+                    <div id="loading-overlay" class="loading-overlay">Wczytywanie danych kartograficznych...</div>
+                    <div id="europe-map"></div>
+
+                    <div class="map-info-box" id="map-info" style="display:none">
+                        <div id="map-info-name" class="info-title"></div>
+                        <div id="map-info-body" class="info-content"></div>
+                        <button class="miniwar-btn" id="miniwar-btn">⚔️ Uzasadnij wojnę</button>
+                    </div>
+
+                    <div class="map-legend">
+                        <div class="legend-title">Sojusze</div>
+                        <div class="legend-item"><span style="background:var(--axis-color)"></span> Oś</div>
+                        <div class="legend-item"><span style="background:var(--allies-color)"></span> Alianci</div>
+                        <div class="legend-item"><span style="background:var(--comintern-color)"></span> Komintern</div>
+                        <div class="legend-item"><span style="background:var(--neutral-color)"></span> Neutralni</div>
+                    </div>
+                </div>
+
+                <div class="event-log-container">
+                    <div class="log-header">📋 DZIENNIK WYDARZEŃ</div>
+                    <div class="event-log" id="event-log"></div>
+                </div>
+            </div>
+
+            <div class="control-panel">
+                <div class="panel-tabs">
+                    <button class="panel-tab active" data-panel="overview">📊 Przegląd</button>
+                    <button class="panel-tab" data-panel="focus">🌲 Fokusy</button>
+                    <button class="panel-tab" data-panel="tech">🔬 Tech</button>
+                    <button class="panel-tab" data-panel="production">🏭 Prod</button>
+                    <button class="panel-tab" data-panel="diplomacy">🌍 Dyplo</button>
+                </div>
+                <div class="panel-content" id="panel-content"></div>
+            </div>
         </div>
-      </div>
-      <button id="combat-round">Rozegraj rundę walki</button>
-    </section>
+    </div>
 
-    <section class="card">
-      <h2>4) System skryptowy (content layer)</h2>
-      <p>Political Power: <span id="pp">120</span></p>
-      <button id="focus-button">Kliknij focus (koszt 75 PP)</button>
-      <p>Event log:</p>
-      <ul id="event-log"></ul>
-    </section>
-  </main>
+    <div class="event-overlay" id="event-overlay">
+        <div class="event-box">
+            <div class="event-title" id="event-title"></div>
+            <div class="event-msg" id="event-msg"></div>
+        </div>
+    </div>
 
-  <script src="app.js"></script>
+    <div class="toast" id="toast"></div>
+
+    <script src="data.js"></script>
+    <script src="game.js"></script>
+    <script>
+        const engine = new GameEngine();
+        const countryGrid = document.getElementById('country-grid');
+        Object.entries(GAME_DATA.countries).forEach(([id, c]) => {
+            const card = document.createElement('div');
+            card.className = 'country-card';
+            card.innerHTML = `
+    <div class="country-flag">${c.flag}</div>
+    <div class="country-name">${c.name}</div>
+    <div class="country-ideology ${c.ideology}">${c.ideology}</div>
+  `;
+            card.addEventListener('click', () => {
+                document.getElementById('start-screen').style.display = 'none';
+                engine.init(id);
+            });
+            countryGrid.appendChild(card);
+        });
+    </script>
 </body>
+
 </html>
