@@ -1,0 +1,34 @@
+Oto techniczny i mechaniczny szkielet gry:
+🛠️ Architektura Systemu (Core Mechanics)
+Z punktu widzenia dewelopera, HoI4 to symulator przepływu danych i zasobów, oparty na czterech modułach:
+1. Globalna Maszyna Stanów (Grand Strategy State Machine)
+Mapa nie jest obrazkiem, to graf połączonych węzłów (prowincji). Każdy węzeł posiada atrybuty: teren, pogoda, infrastruktura i przynależność do "State ID". Gra co godzinę (tick) przelicza interakcje między tymi węzłami.
+2. Silnik Ekonomiczny (Production Queue)
+System oparty na pętli sprzężenia zwrotnego:
+ * Input: Fabryki (moc przerobowa) + Surowce (zmienne statyczne z mapy).
+ * Process: Liniowy postęp produkcji z uwzględnieniem "Efficiency" (funkcja czasu).
+ * Output: Ekwipunek (liczba w ekwipunku globalnym).
+3. Combat Logic (Stat-Checker)
+Walka to w rzeczywistości starcie dwóch zestawów statystyk. Kiedy dwie dywizje spotykają się w węźle:
+ * Gra pobiera wartości: Soft Attack, Hard Attack, Breakthrough, Defense.
+ * Rzuca "kośćmi" (RNG), modyfikuje wynik o teren i pogodę.
+ * Wynik odejmuje wartości od Organization i Strength.
+ * MVP Logic: Jeśli Org == 0, zmień pozycję jednostki na mapie (odwrót).
+4. System Skryptowy (Content Layer)
+To, co gracze widzą jako "Focus Tree", to de facto gigantyczny plik .txt z instrukcjami warunkowymi if/else.
+ * Przykład: if (player_clicks_button) { add_political_power = -75; start_event_id = 102; }
+📊 MVP Scope (Co musiało być w "wersji 1.0")
+Deweloperzy z Paradox musieli dowieźć te elementy, by gra w ogóle była grywalna:
+| Moduł | Cel MVP |
+|---|---|
+| Pathfinding | Algorytm A* dla jednostek, by poruszały się po najkrótszej drodze prowincji. |
+| OOB (Order of Battle) | System przypisywania jednostek do "Generała", by ograniczyć mikrozarządzanie. |
+| Supply System | Algorytm sprawdzający przepustowość od stolicy do frontu (wąskie gardła). |
+| AI Controller | Skrypty nakazujące botowi "wypełniać linię frontu" i klikać focusy. |
+⚠️ Techniczny Dług (Technical Debt) i Wyzwania
+ * Single-threading: Silnik Clausewitz ma tendencję do obciążania głównie jednego rdzenia procesora (przeliczanie tysięcy dywizji w 1945 roku to "late-game lag").
+ * AI Pathfinding: AI często "wariuje" przy przebasowywaniu wojsk przez morza, co jest zmorą optymalizacji.
+ * Desyncs: W multiplayerze utrzymanie identycznego stanu gry na 10 komputerach przy tak dużej liczbie zmiennych to inżynieryjny koszmar.
+🚀 "The Hook" (Dlaczego to działa?)
+Sukcesem deweloperskim HoI4 nie jest realizm, a modowalność. Gra została zbudowana tak, by niemal wszystko (mapy, statystyki, drzewka) było w łatwo edytowalnych plikach tekstowych. To sprawiło, że społeczność wykonuje za deweloperów pracę przy "content creation".
+Czy chciałbyś, żebym przeanalizował, jak od strony logicznej działa system zaopatrzenia (Supply System 2.0), czy może interesuje Cię, jak działają triggery w eventach?
